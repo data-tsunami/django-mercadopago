@@ -4,9 +4,9 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponse
 from django.views.generic.base import View
-from djmercadopago.services import MercadoPagoService
+from djmercadopago.services import MercadoPagoService, BackUrlsBuilder
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,8 @@ class CheckoutView(View):
     def get(self, request, *args, **kwargs):
         params = self.kwargs['params']
 
-        result = self.service.do_checkout(params)
+        result = self.service.do_checkout(params,
+                                          BackUrlsBuilder(request).build())
         url = result.get_url()
 
         logger.info("Redirecting user '%s' to '%s'",
@@ -33,12 +34,18 @@ class CheckoutView(View):
 
 
 class CheckoutSuccessView(View):
-    pass
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("success")
 
 
 class CheckoutFailureView(View):
-    pass
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("failure")
 
 
 class CheckoutPendingView(View):
-    pass
+
+    def get(self, request, *args, **kwargs):
+        return HttpResponse("pending")

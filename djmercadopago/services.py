@@ -13,6 +13,40 @@ import mercadopago
 logger = logging.getLogger(__name__)
 
 
+class BackUrlsBuilder(object):
+
+    def __init__(self):
+        self._success_url = None
+        self._failure_url = None
+        self._pending_url = None
+
+    def build(self,
+              request,
+              success_url=None,
+              failure_url=None,
+              pending_url=None):
+
+        self._success_url = success_url or request.build_absolute_uri(
+            reverse('djmercadopago:back-urls-success'))
+        self._failure_url = failure_url or request.build_absolute_uri(
+            reverse('djmercadopago:back-urls-failure'))
+        self._pending_url = pending_url or request.build_absolute_uri(
+            reverse('djmercadopago:back-urls-pending'))
+        return self
+
+    @property
+    def success_url(self):
+        return self._success_url
+
+    @property
+    def failure_url(self):
+        return self._failure_url
+
+    @property
+    def pending_url(self):
+        return self._pending_url
+
+
 class CheckoutPreference(object):
     """Encapsulate the checkout preference (dict), plus
     utility methods
@@ -53,11 +87,12 @@ class MercadoPagoService(object):
         # FIXME: implement this
         return date.isoformat(b'T')[0:-7] + ".000+00:00"
 
-    def generate_default_checkout_preference_dict(self):
+    def generate_default_checkout_preference_dict(self, back_urls_builder):
+        assert isinstance(back_urls_builder, BackUrlsBuilder)
         return dict(back_urls=dict(
-            success=reverse('djmercadopago:back-urls-success'),
-            failure=reverse('djmercadopago:back-urls-failure'),
-            pending=reverse('djmercadopago:back-urls-pending'),))
+            success=back_urls_builder.success_url,
+            failure=back_urls_builder.failure_url,
+            pending=back_urls_builder.pending_url))
 
     def get_update_preferences_callback(self):
         function_string = settings.DJMERCADOPAGO_CHECKOUT_PREFERENCE_BUILDER
@@ -66,24 +101,26 @@ class MercadoPagoService(object):
         func = getattr(mod, func_name)
         return func
 
-    def get_checkout_preferences(self, user_params):
+    def get_checkout_preferences(self, user_params, back_urls_builder):
         """Returns CheckoutPreference"""
         update_preferences_callback = \
-            self.generate_default_checkout_preference_dict()
+            self.get_update_preferences_callback()
 
         # FIXME: report detailed report if can't get the function
-        checkout_preferences = self.generate_default_checkout_preference()
+        checkout_preferences = self.generate_default_checkout_preference_dict(
+            back_urls_builder)
         update_preferences_callback(checkout_preferences, user_params)
 
         return CheckoutPreference(checkout_preferences)
 
-    def do_checkout(self, user_params):
+    def do_checkout(self, user_params, back_urls_builder):
         mp = mercadopago.MP(settings.DJMERCADOPAGO_CLIENT_ID,
                             settings.DJMERCADOPAGO_CLIENTE_SECRET)
         logger.debug("sandbox_mode: %s",
                      settings.DJMERCADOPAGO_SANDBOX_MODE)
         mp.sandbox_mode(settings.DJMERCADOPAGO_SANDBOX_MODE)
-        checkout_preferences = self.get_checkout_preferences(user_params)
+        checkout_preferences = self.get_checkout_preferences(user_params,
+                                                             back_urls_builder)
         # FIXME: the next generates a http request. This should be executed
         # in Celery
         checkout_preference_result = mp.create_preference(checkout_preferences)
