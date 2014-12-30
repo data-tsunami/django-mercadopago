@@ -7,3 +7,4 @@
 /.settings
 /django_mercadopago.egg-info
 /dist
+/test_project/db.sqlite3
