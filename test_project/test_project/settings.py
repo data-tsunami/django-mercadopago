@@ -110,15 +110,12 @@ LOGGING = {
             'level': 'INFO',
         },
         'django.db.backends': {
-            'handlers': ['console'],
             'level': 'INFO',
         },
         'djmercadopago': {
-            'handlers': ['console'],
             'level': 'DEBUG',
         },
         'requests': {
-            'handlers': ['console'],
             'level': 'DEBUG',
         },
     }
