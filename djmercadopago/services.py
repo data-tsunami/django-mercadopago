@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class BackUrlsBuilder(object):
+    """Generates the URLs for the 'back-urls'
+    checkout preference
+    """
 
     def __init__(self):
         self._success_url = None
@@ -26,7 +29,7 @@ class BackUrlsBuilder(object):
               success_url=None,
               failure_url=None,
               pending_url=None):
-
+        """Generate default urls"""
         self._success_url = success_url or request.build_absolute_uri(
             reverse('djmercadopago:back-urls-success'))
         self._failure_url = failure_url or request.build_absolute_uri(
@@ -50,7 +53,7 @@ class BackUrlsBuilder(object):
 
 class CheckoutPreference(object):
     """Encapsulate the checkout preference (dict), plus
-    utility methods
+    utility methods.
     """
     def __init__(self, checkout_preferences):
         self._preferences = checkout_preferences
