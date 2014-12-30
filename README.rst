@@ -4,6 +4,10 @@ djmercadopago
 
 djmercadopago is a simple Django app to use MercadoPago
 
+
+THIS IS WIP. THIS DOESN'T WORK YET.
+
+
 Quick start
 -----------
 
