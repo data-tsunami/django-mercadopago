@@ -83,3 +83,54 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': ('%(asctime)-15s [%(levelname)7s] %(name)20s - '
+                       '%(message)s')
+        },
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'djmercadopago': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'requests': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    }
+}
+
+try:
+    from djmercadopago_test_app_settings import *  # @UnusedWildImport
+except ImportError as e:
+    print("# ")
+    print("# ERROR")
+    print("# ")
+    print("#   Couldn't import")
+    print("#       `djmercadopago_test_app_settings`")
+    print("# ")
+    raise Exception("Couldn't import 'djmercadopago_test_app_settings'")
