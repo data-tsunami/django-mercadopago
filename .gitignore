@@ -6,3 +6,4 @@
 /.pydevproject
 /.settings
 /django_mercadopago.egg-info
+/dist
