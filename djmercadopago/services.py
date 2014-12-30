@@ -8,6 +8,7 @@ import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 import mercadopago
+import pprint
 
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,9 @@ class CheckoutPreference(object):
         for item in self._preferences["items"]:
             assert "external_reference" in item
 
+    def dump_as_string(self):
+        return pprint.pformat(self._preferences)
+
 
 class CheckoutPreferenceResult(object):
     """Encapsulate the RESULT of checkout (dict), plus
@@ -79,6 +83,9 @@ class CheckoutPreferenceResult(object):
                      url,
                      settings.DJMERCADOPAGO_SANDBOX_MODE)
         return url
+
+    def dump_as_string(self):
+        return pprint.pformat(self._result)
 
 
 class MercadoPagoService(object):
@@ -121,11 +128,15 @@ class MercadoPagoService(object):
         mp.sandbox_mode(settings.DJMERCADOPAGO_SANDBOX_MODE)
         checkout_preferences = self.get_checkout_preferences(user_params,
                                                              back_urls_builder)
+
+        logger.debug("do_checkout(): checkout_preferences:\n%s",
+                     checkout_preferences.dump_as_string())
+
         # FIXME: the next generates a http request. This should be executed
         # in Celery
         checkout_preference_result = mp.create_preference(checkout_preferences)
 
-        logger.debug("Responso of mp.create_preference(): %s",
-                     checkout_preference_result)
+        logger.debug("do_checkout(): checkout_preference_result:\n%s",
+                     checkout_preference_result.dump_as_string())
 
         return CheckoutPreferenceResult(checkout_preference_result)
