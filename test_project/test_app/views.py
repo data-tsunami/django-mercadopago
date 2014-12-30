@@ -1,5 +1,9 @@
-from django.http.response import HttpResponse
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
+from django.views.generic.base import TemplateView
 
 
-def home(request):
-    return HttpResponse('<html>Home</html>')
+class HomeView(TemplateView):
+    template_name = 'test_app/index.html'
