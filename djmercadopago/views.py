@@ -24,7 +24,7 @@ class CheckoutView(View):
         params = self.kwargs['params']
 
         result = self.service.do_checkout(params,
-                                          BackUrlsBuilder(request).build())
+                                          BackUrlsBuilder().build(request))
         url = result.get_url()
 
         logger.info("Redirecting user '%s' to '%s'",
