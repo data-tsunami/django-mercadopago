@@ -9,7 +9,8 @@ from djmercadopago.views import (CheckoutView,
                                  CheckoutPendingView)
 
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^checkout/(?P<params>.+)/$',
         CheckoutView.as_view(),
         name='checkout'),

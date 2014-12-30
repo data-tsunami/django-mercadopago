@@ -10,6 +10,6 @@ from test_app.views import HomeView
 urlpatterns = patterns(
     '',
     url(r'^$', HomeView.as_view(), name='home'),
-    url(r'^mp/', include('djmercadopago.urls')),
+    url(r'^mp/', include('djmercadopago.urls', namespace="djmercadopago")),
     url(r'^admin/', include(admin.site.urls)),
 )

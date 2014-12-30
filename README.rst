@@ -20,6 +20,10 @@ Quick start
 
 2. Include the polls URLconf in your project urls.py like this::
 
-    url(r'^mp/', include('djmercadopago.urls')),
+    url(r'^mp/', include('djmercadopago.urls', namespace="djmercadopago")),
 
 3. Run `python manage.py migrate` to create the polls models.
+
+4. In your template, add a link to the checkout view:
+
+    <a href="{% url 'djmercadopago:checkout' 'some-item-id' %}">Checkout</a>
