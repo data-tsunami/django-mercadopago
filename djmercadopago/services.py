@@ -75,15 +75,15 @@ class CheckoutPreferenceResult(object):
     def __init__(self, result):
         self._result = result
 
-    def get_url(self):
+    @property
+    def url(self):
         assert "response" in self._result
         if settings.DJMERCADOPAGO_SANDBOX_MODE:
             url = self._result["response"]["sandbox_init_point"]
         else:
             url = self._result["response"]["init_point"]
 
-        logger.debug("get_url(): '%s' (sandbox mode: %s)",
-                     url,
+        logger.debug("url: '%s' (sandbox mode: %s)", url,
                      settings.DJMERCADOPAGO_SANDBOX_MODE)
         return url
 
@@ -97,47 +97,61 @@ class MercadoPagoService(object):
         # FIXME: implement this
         return date.isoformat(b'T')[0:-7] + ".000+00:00"
 
-    def generate_default_checkout_preference_dict(self, back_urls_builder):
+    def _default_checkout_preference_dict(self, back_urls_builder):
+        """Generates a checkout preference with default settings"""
         assert isinstance(back_urls_builder, BackUrlsBuilder)
         return dict(back_urls=dict(
             success=back_urls_builder.success_url,
             failure=back_urls_builder.failure_url,
             pending=back_urls_builder.pending_url))
 
-    def get_update_preferences_callback(self):
-        function_string = settings.DJMERCADOPAGO_CHECKOUT_PREFERENCE_BUILDER
+    def _get_update_preferences_function(self):
+        """Returns the functions (implemented by the user) updates
+        the checkout preferences dict.
+        """
+        function_string = settings.\
+            DJMERCADOPAGO_CHECKOUT_PREFERENCE_UPDATER_FUNCTION
         mod_name, func_name = function_string.rsplit('.', 1)
         mod = importlib.import_module(mod_name)
         func = getattr(mod, func_name)
+        assert callable(func)
         return func
 
-    def get_checkout_preferences(self, user_params, back_urls_builder):
+    def _generate_checkout_preferences(self, user_params, back_urls_builder):
         """Returns CheckoutPreference"""
-        update_preferences_callback = \
-            self.get_update_preferences_callback()
+        update_preferences_function = \
+            self._get_update_preferences_function()
 
-        # FIXME: report detailed report if can't get the function
-        checkout_preferences = self.generate_default_checkout_preference_dict(
+        # FIXME: report detailed error if can't get the function
+        checkout_preferences = self._default_checkout_preference_dict(
             back_urls_builder)
-        update_preferences_callback(checkout_preferences, user_params)
+        update_preferences_function(checkout_preferences, user_params)
 
         return CheckoutPreference(checkout_preferences)
 
+    def _call_mp(self, mp, checkout_preferences):
+        checkout_preference_result = mp.create_preference(checkout_preferences)
+        return checkout_preference_result
+
     def do_checkout(self, user_params, back_urls_builder):
+        """Do the checkout process.
+
+        :returns: CheckoutPreferenceResult
+        """
         mp = mercadopago.MP(settings.DJMERCADOPAGO_CLIENT_ID,
                             settings.DJMERCADOPAGO_CLIENTE_SECRET)
         logger.debug("sandbox_mode: %s",
                      settings.DJMERCADOPAGO_SANDBOX_MODE)
         mp.sandbox_mode(settings.DJMERCADOPAGO_SANDBOX_MODE)
-        checkout_preferences = self.get_checkout_preferences(user_params,
-                                                             back_urls_builder)
+        checkout_preferences = self._generate_checkout_preferences(
+            user_params, back_urls_builder)
 
         logger.debug("do_checkout(): checkout_preferences:\n%s",
                      checkout_preferences.dump_as_string())
 
         # FIXME: the next generates a http request. This should be executed
         # in Celery
-        checkout_preference_result = mp.create_preference(checkout_preferences)
+        checkout_preference_result = self._call_mp(mp, checkout_preferences)
 
         logger.debug("do_checkout(): checkout_preference_result:\n%s",
                      checkout_preference_result.dump_as_string())
