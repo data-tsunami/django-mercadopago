@@ -19,7 +19,7 @@ setup(
     license='BSD License',
     description='A simple Django app to use MercadoPago.',
     long_description=README,
-    url='http://github.com/hgdeoro/django-mercadopago',
+    url='https://github.com/data-tsunami/django-mercadopago',
     author='Horacio Guillermo de Oro',
     author_email='hgdeoro@gmail.com',
     classifiers=[
