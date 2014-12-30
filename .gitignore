@@ -1,0 +1,7 @@
+*.pyc
+/virtualenv
+*~
+*.bak
+/.project
+/.pydevproject
+/.settings
