@@ -133,16 +133,21 @@ class MercadoPagoService(object):
         checkout_preference_result = mp.create_preference(checkout_preferences)
         return checkout_preference_result
 
+    def get_mercadopago(self):
+        """Returns MP instance"""
+        mp = mercadopago.MP(settings.DJMERCADOPAGO_CLIENT_ID,
+                            settings.DJMERCADOPAGO_CLIENTE_SECRET)
+        logger.debug("Returning MP instance with sandbox_mode: %s",
+                     settings.DJMERCADOPAGO_SANDBOX_MODE)
+        mp.sandbox_mode(settings.DJMERCADOPAGO_SANDBOX_MODE)
+        return mp
+
     def do_checkout(self, user_params, back_urls_builder):
         """Do the checkout process.
 
         :returns: CheckoutPreferenceResult
         """
-        mp = mercadopago.MP(settings.DJMERCADOPAGO_CLIENT_ID,
-                            settings.DJMERCADOPAGO_CLIENTE_SECRET)
-        logger.debug("sandbox_mode: %s",
-                     settings.DJMERCADOPAGO_SANDBOX_MODE)
-        mp.sandbox_mode(settings.DJMERCADOPAGO_SANDBOX_MODE)
+        mp = self.get_mercadopago()
         checkout_preferences = self._generate_checkout_preferences(
             user_params, back_urls_builder)
 
