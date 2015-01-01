@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 import mercadopago
 import pprint
+from copy import deepcopy
 
 
 logger = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ class CheckoutPreference(object):
 
     @property
     def preferences(self):
-        return self._preferences
+        return deepcopy(self._preferences)
 
     def dump_as_string(self):
         return pprint.pformat(self._preferences)
@@ -78,6 +79,10 @@ class CheckoutPreferenceResult(object):
     """
     def __init__(self, result):
         self._result = result
+
+    @property
+    def result(self):
+        return deepcopy(self._result)
 
     @property
     def url(self):
