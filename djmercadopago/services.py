@@ -64,6 +64,10 @@ class CheckoutPreference(object):
         for item in self._preferences["items"]:
             assert "external_reference" in item
 
+    @property
+    def preferences(self):
+        return self._preferences
+
     def dump_as_string(self):
         return pprint.pformat(self._preferences)
 
@@ -130,7 +134,9 @@ class MercadoPagoService(object):
         return CheckoutPreference(checkout_preferences)
 
     def _call_mp(self, mp, checkout_preferences):
-        checkout_preference_result = mp.create_preference(checkout_preferences)
+        assert isinstance(checkout_preferences, CheckoutPreference)
+        checkout_preference_result = mp.create_preference(
+            checkout_preferences.preferences)
         return checkout_preference_result
 
     def get_mercadopago(self):
@@ -156,9 +162,12 @@ class MercadoPagoService(object):
 
         # FIXME: the next generates a http request. This should be executed
         # in Celery
-        checkout_preference_result = self._call_mp(mp, checkout_preferences)
+        checkout_preference_result_dict = self._call_mp(mp,
+                                                        checkout_preferences)
+        checkout_preference_result = CheckoutPreferenceResult(
+            checkout_preference_result_dict)
 
         logger.debug("do_checkout(): checkout_preference_result:\n%s",
                      checkout_preference_result.dump_as_string())
 
-        return CheckoutPreferenceResult(checkout_preference_result)
+        return
