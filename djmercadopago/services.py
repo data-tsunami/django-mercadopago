@@ -2,14 +2,14 @@
 
 from __future__ import unicode_literals
 
+from copy import deepcopy
 import importlib
 import logging
+import pprint
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 import mercadopago
-import pprint
-from copy import deepcopy
 
 
 logger = logging.getLogger(__name__)
@@ -138,7 +138,7 @@ class MercadoPagoService(object):
 
         return CheckoutPreference(checkout_preferences)
 
-    def _call_mp(self, mp, checkout_preferences):
+    def _call_mp_create_preference(self, mp, checkout_preferences):
         assert isinstance(checkout_preferences, CheckoutPreference)
         checkout_preference_result = mp.create_preference(
             checkout_preferences.preferences)
@@ -167,8 +167,8 @@ class MercadoPagoService(object):
 
         # FIXME: the next generates a http request. This should be executed
         # in Celery
-        checkout_preference_result_dict = self._call_mp(mp,
-                                                        checkout_preferences)
+        checkout_preference_result_dict = self._call_mp_create_preference(
+            mp, checkout_preferences)
         checkout_preference_result = CheckoutPreferenceResult(
             checkout_preference_result_dict)
 
