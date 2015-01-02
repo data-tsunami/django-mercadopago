@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.db import models
 
 
-class Checkout(models.Model):
+class Payment(models.Model):
     # payment_id = models.BigIntegerField(null=True)
     checkout_preferences = models.TextField()
     checkout_response = models.TextField()
