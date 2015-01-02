@@ -178,4 +178,4 @@ class MercadoPagoService(object):
         logger.debug("do_checkout(): checkout_preference_result:\n%s",
                      checkout_preference_result.dump_as_string())
 
-        return
+        return checkout_preference_result
