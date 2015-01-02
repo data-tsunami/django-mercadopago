@@ -9,3 +9,4 @@
 /dist
 /sample_project/db.sqlite3
 /sample_project/djmercadopago_sample_app_settings.py
+/db.sqlite3
