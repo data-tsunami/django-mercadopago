@@ -23,6 +23,7 @@ setup(
     author='Horacio Guillermo de Oro',
     author_email='hgdeoro@gmail.com',
     classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
