@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+import uuid
 
 # from django.db import models
 
 
 def update_checkout_preference(checkout_preference, params):
-    external_reference = "payment-for-user-123"
+    external_reference = "payment-for-user-123-{0}".format(uuid.uuid4())
     checkout_preference.update({
         "items": [
             {
