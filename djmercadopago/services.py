@@ -62,8 +62,7 @@ class CheckoutPreference(object):
         # FIXME: generate custom exception with better messages
         # FIXME: add doc about requeriment of 'external_reference'
         assert self._preferences.get("items")
-        for item in self._preferences["items"]:
-            assert "external_reference" in item
+        assert "external_reference" in self._preferences
 
     @property
     def preferences(self):
@@ -83,6 +82,10 @@ class CheckoutPreferenceResult(object):
     @property
     def result(self):
         return deepcopy(self._result)
+
+    @property
+    def external_reference(self):
+        return self._result["response"]["external_reference"]
 
     @property
     def url(self):
