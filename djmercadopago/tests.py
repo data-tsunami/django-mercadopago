@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 from djmercadopago.services import MercadoPagoService, BackUrlsBuilder, \
-    CheckoutPreferenceResult
+    CheckoutPreferenceResult, SearchResult
 import os
+from djmercadopago.models import Payment
 
 
 class BackUrlsBuilderMock(BackUrlsBuilder):
@@ -22,12 +23,24 @@ class TestMercadoPagoService(TestCase):
         service = MercadoPagoService()
 
         checkout_result = service.do_checkout('', BackUrlsBuilderMock())
-        assert isinstance(checkout_result, CheckoutPreferenceResult)
+
+        self.assertTrue(checkout_result is not None)
+        self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))
         self.assertTrue(checkout_result.url)
         self.assertTrue(checkout_result.external_reference)
+        self.assertTrue(checkout_result.payment)
+        self.assertTrue(checkout_result.payment.id is not None)
+
+        payment = Payment.objects.get(id=checkout_result.payment.id)
+        self.assertTrue(payment.checkout_preferences)
+        self.assertTrue(payment.checkout_response)
+        self.assertTrue(payment.checkout_response)
 
         search_result = service.search_payment_by_external_reference(
             checkout_result.external_reference)
+
+        self.assertTrue(search_result is not None)
+        self.assertTrue(isinstance(search_result, SearchResult))
 
     def _search_payment_by_external_reference(self):
         """Utility method to be called from CLI. Not a real test"""

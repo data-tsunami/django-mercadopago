@@ -9,6 +9,7 @@ import pprint
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from djmercadopago.models import Payment
 import mercadopago
 
 
@@ -68,20 +69,29 @@ class CheckoutPreference(object):
     def preferences(self):
         return deepcopy(self._preferences)
 
+    @property
+    def external_reference(self):
+        return self._preferences["external_reference"]
+
     def dump_as_string(self):
         return pprint.pformat(self._preferences)
 
 
 class CheckoutPreferenceResult(object):
-    """Encapsulate the RESULT of checkout (dict), plus
-    utility methods
+    """Encapsulate the RESULT of checkout (dict), the Payment instance,
+    plus utility methods
     """
-    def __init__(self, result):
+    def __init__(self, result, payment):
         self._result = result
+        self._payment = payment
 
     @property
     def result(self):
         return deepcopy(self._result)
+
+    @property
+    def payment(self):
+        return self._payment
 
     @property
     def external_reference(self):
@@ -186,15 +196,23 @@ class MercadoPagoService(object):
         logger.debug("do_checkout(): checkout_preferences:\n%s",
                      checkout_preferences.dump_as_string())
 
+        payment = Payment()
+        payment.checkout_preferences = checkout_preferences.dump_as_string()
+        payment.external_reference = checkout_preferences.external_reference
+        payment.save()
+
         # FIXME: the next generates a http request. This should be executed
         # in Celery
         checkout_preference_result_dict = self._call_mp_create_preference(
             mp, checkout_preferences)
         checkout_preference_result = CheckoutPreferenceResult(
-            checkout_preference_result_dict)
+            checkout_preference_result_dict, payment)
 
         logger.debug("do_checkout(): checkout_preference_result:\n%s",
                      checkout_preference_result.dump_as_string())
+
+        payment.checkout_response = checkout_preference_result.dump_as_string()
+        payment.save()
 
         return checkout_preference_result
 
