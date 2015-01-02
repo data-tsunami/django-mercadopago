@@ -7,5 +7,5 @@
 /.settings
 /django_mercadopago.egg-info
 /dist
-/test_project/db.sqlite3
-/test_project/djmercadopago_test_app_settings.py
+/sample_project/db.sqlite3
+/sample_project/djmercadopago_test_app_settings.py
