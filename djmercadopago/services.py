@@ -103,6 +103,24 @@ class CheckoutPreferenceResult(object):
         return pprint.pformat(self._result)
 
 
+class SearchResult(object):
+    """Encapsulate the result of a search, plus
+    utility methods.
+    """
+    def __init__(self, search_result):
+        self._search_result = search_result
+
+        # FIXME: generate custom exception with better messages
+        assert "response" in self._search_result
+        assert "results" in self._search_result["response"]
+
+    def get_payments(self):
+        return deepcopy(self._search_result["response"]["results"])
+
+    def dump_as_string(self):
+        return pprint.pformat(self._search_result)
+
+
 class MercadoPagoService(object):
 
     def get_as_iso8601(self, date):
@@ -179,3 +197,27 @@ class MercadoPagoService(object):
                      checkout_preference_result.dump_as_string())
 
         return checkout_preference_result
+
+    def search_payment_by_external_reference(self, external_reference):
+        """Search payments by 'external reference'
+
+        :returns: SearchResult
+        """
+        mp = self.get_mercadopago()
+
+        filters = {
+            "site_id": "MLA",  # Argentina: MLA; Brasil: MLB
+            "external_reference": external_reference,
+        }
+        # FIXME: move 'site_id' to settings
+
+        logger.debug("search_payment_by_external_reference(): "
+                     "filters:\n%s",
+                     filters)
+
+        search_result_dict = mp.search_payment(filters)
+        search_result = SearchResult(search_result_dict)
+
+        logger.debug("search_payment_by_external_reference(): "
+                     "search_result:\n%s",
+                     search_result.dump_as_string())

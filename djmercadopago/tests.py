@@ -25,4 +25,5 @@ class TestMercadoPagoService(TestCase):
         self.assertTrue(checkout_result.url)
         self.assertTrue(checkout_result.external_reference)
 
-        # service.search_by_external(checkout_result.external_reference)
+        search_result = service.search_payment_by_external_reference(
+            checkout_result.external_reference)
