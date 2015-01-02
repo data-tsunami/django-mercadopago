@@ -221,3 +221,5 @@ class MercadoPagoService(object):
         logger.debug("search_payment_by_external_reference(): "
                      "search_result:\n%s",
                      search_result.dump_as_string())
+
+        return search_result
