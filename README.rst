@@ -27,3 +27,8 @@ Quick start
 4. In your template, add a link to the checkout view:
 
     <a href="{% url 'djmercadopago:checkout' 'some-item-id' %}">Checkout</a>
+
+Known issues
+------------
+
+* Transactions should be atomic
