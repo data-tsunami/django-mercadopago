@@ -1,5 +1,5 @@
 """
-Django settings for test_project project.
+Django settings for sample_project project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -27,7 +27,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 MIGRATION_MODULES = {
-    "test_app": "migrations",
+    "sample_app": "migrations",
     "djmercadopago": "migrations",
 }
 
@@ -40,7 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'test_app',
+    'sample_app',
     'djmercadopago',
 )
 
@@ -54,9 +54,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'test_project.urls'
+ROOT_URLCONF = 'sample_project.urls'
 
-WSGI_APPLICATION = 'test_project.wsgi.application'
+WSGI_APPLICATION = 'sample_project.wsgi.application'
 
 
 # Database
@@ -126,12 +126,12 @@ LOGGING = {
 }
 
 try:
-    from djmercadopago_test_app_settings import *  # @UnusedWildImport
+    from djmercadopago_sample_app_settings import *  # @UnusedWildImport
 except ImportError as e:
     print("# ")
     print("# ERROR")
     print("# ")
     print("#   Couldn't import")
-    print("#       `djmercadopago_test_app_settings`")
+    print("#       `djmercadopago_sample_app_settings`")
     print("# ")
-    raise Exception("Couldn't import 'djmercadopago_test_app_settings'")
+    raise Exception("Couldn't import 'djmercadopago_sample_app_settings'")
