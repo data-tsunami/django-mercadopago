@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from djmercadopago.services import MercadoPagoService, BackUrlsBuilder, \
     CheckoutPreferenceResult
+import os
 
 
 class BackUrlsBuilderMock(BackUrlsBuilder):
@@ -27,3 +28,11 @@ class TestMercadoPagoService(TestCase):
 
         search_result = service.search_payment_by_external_reference(
             checkout_result.external_reference)
+
+    def _search_payment_by_external_reference(self):
+        """Utility method to be called from CLI. Not a real test"""
+        service = MercadoPagoService()
+        search_result = service.search_payment_by_external_reference(
+            os.environ['EXTERNAL_REFERENCE'])
+        print "------------------------------------------------------------"
+        print search_result.dump_as_string()
