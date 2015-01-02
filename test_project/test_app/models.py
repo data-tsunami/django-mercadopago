@@ -2,11 +2,11 @@
 
 from __future__ import unicode_literals
 
-from django.db import models
+# from django.db import models
 
 
 def update_checkout_preference(checkout_preference, params):
-    external_reference = "my-product-cod-28734234"
+    external_reference = "payment-for-user-123"
     checkout_preference.update({
         "items": [
             {
@@ -14,7 +14,7 @@ def update_checkout_preference(checkout_preference, params):
                 "quantity": 1,
                 "currency_id": "ARS",
                 "unit_price": 100,
-                "external_reference": external_reference,
             }
         ],
+        "external_reference": external_reference,
     })
