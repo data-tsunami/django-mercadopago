@@ -13,8 +13,8 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-mercadopago',
-    version='0.0.2-dev',
-    packages=['djmercadopago'],
+    version='0.0.2.dev',
+    packages=['djmercadopago', 'djmercadopago.migrations'],
     include_package_data=True,
     license='BSD License',
     description='A simple Django app to use MercadoPago.',
