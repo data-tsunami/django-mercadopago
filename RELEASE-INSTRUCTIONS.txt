@@ -9,7 +9,7 @@
     python setup.py register -r https://testpypi.python.org/pypi
     python setup.py sdist upload -r https://testpypi.python.org/pypi
     TMPVE="/tmp/$(uuidgen)" && virtualenv $TMPVE && source $TMPVE/bin/activate
-    pip install -i https://testpypi.python.org/pypi django-mercadopago
+    pip install --pre -i https://testpypi.python.org/pypi django-mercadopago
 
 * Create tag
 
