@@ -22,4 +22,4 @@
 * Bump version number, add '-dev'
 
     vim setup.py
-    VER="$(python setup.py --version)" && git commit -m 'Bump version: $VER' setup.py
+    VER="$(python setup.py --version)" && git commit -m "Bump version: $VER" setup.py
