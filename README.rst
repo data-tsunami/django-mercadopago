@@ -33,3 +33,4 @@ Known issues
 
 * Transactions should be atomic
     See: https://docs.djangoproject.com/en/1.7/topics/db/transactions/#django.db.transaction.non_atomic_requests
+* Supports Python 2.7 and Django 1.7 only
