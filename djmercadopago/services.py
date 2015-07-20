@@ -9,7 +9,7 @@ import pprint
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from djmercadopago.models import Payment
+from djmercadopago import models
 import mercadopago
 
 
@@ -100,13 +100,12 @@ class CheckoutPreferenceResult(object):
     @property
     def url(self):
         assert "response" in self._result
-        if settings.DJMERCADOPAGO_SANDBOX_MODE:
+        if models.SETTINGS.sandbox_mode:
             url = self._result["response"]["sandbox_init_point"]
         else:
             url = self._result["response"]["init_point"]
 
-        logger.debug("url: '%s' (sandbox mode: %s)", url,
-                     settings.DJMERCADOPAGO_SANDBOX_MODE)
+        logger.debug("url: '%s' (sandbox mode: %s)", url, models.SETTINGS.sandbox_mode)
         return url
 
     def dump_as_string(self):
@@ -149,8 +148,7 @@ class MercadoPagoService(object):
         """Returns the functions (implemented by the user) updates
         the checkout preferences dict.
         """
-        function_string = settings.\
-            DJMERCADOPAGO_CHECKOUT_PREFERENCE_UPDATER_FUNCTION
+        function_string = models.SETTINGS.checkout_preference_updater_function
         mod_name, func_name = function_string.rsplit('.', 1)
         mod = importlib.import_module(mod_name)
         func = getattr(mod, func_name)
@@ -177,11 +175,11 @@ class MercadoPagoService(object):
 
     def get_mercadopago(self):
         """Returns MP instance"""
-        mp = mercadopago.MP(settings.DJMERCADOPAGO_CLIENT_ID,
-                            settings.DJMERCADOPAGO_CLIENTE_SECRET)
+        mp = mercadopago.MP(models.SETTINGS.client_id,
+                            models.SETTINGS.client_secret)
         logger.debug("Returning MP instance with sandbox_mode: %s",
-                     settings.DJMERCADOPAGO_SANDBOX_MODE)
-        mp.sandbox_mode(settings.DJMERCADOPAGO_SANDBOX_MODE)
+                     models.SETTINGS.sandbox_mode)
+        mp.sandbox_mode(models.SETTINGS.sandbox_mode)
         return mp
 
     def do_checkout(self, user_params, back_urls_builder):
@@ -196,7 +194,7 @@ class MercadoPagoService(object):
         logger.debug("do_checkout(): checkout_preferences:\n%s",
                      checkout_preferences.dump_as_string())
 
-        payment = Payment()
+        payment = models.Payment()
         payment.checkout_preferences = checkout_preferences.dump_as_string()
         payment.external_reference = checkout_preferences.external_reference
         payment.save()
