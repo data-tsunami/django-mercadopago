@@ -1,9 +1,17 @@
+Run unittests
+-------------
+
+Create `sample_project/djmercadopago_sample_app_settings.py` and run:
+
+    PYTHONPATH=. python sample_project/manage.py test djmercadopago
+
 
 Remove '-dev' from version
 --------------------------
 
     vim setup.py
     VER="$(python setup.py --version)" && git commit -m 'Bump version: $VER' setup.py
+
 
 Upload to pypi TESTING
 ----------------------
@@ -13,15 +21,18 @@ Upload to pypi TESTING
     TMPVE="/tmp/$(uuidgen)" && virtualenv $TMPVE && source $TMPVE/bin/activate
     pip install --pre -i https://testpypi.python.org/pypi django-mercadopago
 
+
 Create Git tag
 --------------
 
     VER="$(python setup.py --version)" && git tag -a -m "Version ${VER}" "v${VER}"
 
+
 Upload to pypi
 --------------
 
     python setup.py upload -r https://testpypi.python.org/pypi
+
 
 Bump version number, add '-dev'
 -------------------------------
