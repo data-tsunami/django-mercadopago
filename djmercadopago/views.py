@@ -6,6 +6,7 @@ import logging
 
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.views.generic.base import View
+
 from djmercadopago.services import MercadoPagoService, BackUrlsBuilder
 
 

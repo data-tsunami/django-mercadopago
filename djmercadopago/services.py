@@ -7,10 +7,10 @@ import importlib
 import logging
 import pprint
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from djmercadopago import models
 import mercadopago
+from django.core.urlresolvers import reverse
+
+from djmercadopago import models
 
 
 logger = logging.getLogger(__name__)

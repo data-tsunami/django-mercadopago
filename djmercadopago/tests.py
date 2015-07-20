@@ -2,10 +2,12 @@
 
 from __future__ import unicode_literals
 
-from django.test import TestCase
-from djmercadopago.services import MercadoPagoService, BackUrlsBuilder, \
-    CheckoutPreferenceResult, SearchResult
 import os
+
+from django.test import TestCase
+
+from djmercadopago.services import (
+    MercadoPagoService, BackUrlsBuilder, CheckoutPreferenceResult, SearchResult)
 from djmercadopago.models import Payment
 
 
