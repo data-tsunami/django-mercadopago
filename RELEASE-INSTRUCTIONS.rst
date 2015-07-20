@@ -16,8 +16,8 @@ Remove '-dev' from version
 Upload to pypi TESTING
 ----------------------
 
-    python setup.py register -r https://testpypi.python.org/pypi
-    python setup.py sdist upload -r https://testpypi.python.org/pypi
+    python setup.py register -r pypitest
+    python setup.py sdist upload -r pypitest
     TMPVE="/tmp/$(uuidgen)" && virtualenv $TMPVE && source $TMPVE/bin/activate
     pip install --pre -i https://testpypi.python.org/pypi django-mercadopago
 
@@ -31,7 +31,8 @@ Create Git tag
 Upload to pypi
 --------------
 
-    python setup.py upload -r https://testpypi.python.org/pypi
+    python setup.py register -r pypi
+    python setup.py sdist upload -r pypi
 
 
 Bump version number, add '-dev'
