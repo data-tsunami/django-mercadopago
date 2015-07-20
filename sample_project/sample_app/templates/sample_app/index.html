@@ -33,9 +33,23 @@
 
 	<div class="container">
 		<h1>Buy</h1>
-		<a href="{% url 'djmercadopago:checkout' 'product-1' %}"
-			class="btn btn-primary">Checkout</a>
+		<table class="table">
+
+			{% for product in product_list %}
+				<tr>
+					<td width="20%">
+						<a href="{% url 'djmercadopago:checkout' product.0 %}"
+							class="btn btn-primary">Checkout</a>
+					</td>
+					<td width="10%">${{product.1.PRICE}}</td>
+					<td width="70%">{{product.1.NAME}}</td>
+				</tr>
+			{% endfor %}
+
+		</table>
+
 	</div>
+
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script
