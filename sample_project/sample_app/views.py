@@ -14,3 +14,8 @@ class HomeView(TemplateView):
         ctx = super(HomeView, self).get_context_data(**kwargs)
         ctx['product_list'] = models.PRODUCT_LIST
         return ctx
+
+
+class SuccessfulCheckoutView(TemplateView):
+    template_name = 'sample_app/success.html'
+    pass
