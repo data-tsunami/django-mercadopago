@@ -36,7 +36,7 @@ Upload to pypi
     twine upload dist/*
 
 
-Bump version number, add '-dev'
+Bump version number, add '.dev0'
 -------------------------------
 
     vim setup.py
