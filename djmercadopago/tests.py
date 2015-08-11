@@ -24,9 +24,6 @@ DJMERCADOPAGO_UNITTEST_SETTINGS = {
 
 
 def update_checkout_preference(checkout_preference, param, request):
-
-    # shopping_cart = ShoppingCart.objects.get(pk=int(param))
-
     external_reference = "checkout-id"
     checkout_preference.update({
         "items": [
