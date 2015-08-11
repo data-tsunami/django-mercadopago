@@ -167,12 +167,6 @@ class MercadoPagoService(object):
 
         return CheckoutPreference(checkout_preferences)
 
-    def _call_mp_create_preference(self, mp, checkout_preferences):
-        assert isinstance(checkout_preferences, CheckoutPreference)
-        checkout_preference_result = mp.create_preference(
-            checkout_preferences.preferences)
-        return checkout_preference_result
-
     def get_mercadopago(self):
         """Returns MP instance"""
         mp = mercadopago.MP(models.SETTINGS.client_id,
@@ -199,10 +193,9 @@ class MercadoPagoService(object):
         payment.external_reference = checkout_preferences.external_reference
         payment.save()
 
-        # FIXME: the next generates a http request. This should be executed
-        # in Celery
-        checkout_preference_result_dict = self._call_mp_create_preference(
-            mp, checkout_preferences)
+        # FIXME: the next generates a http request. This should be executed in Celery
+        checkout_preference_result_dict = mp.create_preference(checkout_preferences.preferences)
+
         checkout_preference_result = CheckoutPreferenceResult(
             checkout_preference_result_dict, payment)
 
