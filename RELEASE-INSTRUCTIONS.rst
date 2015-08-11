@@ -32,7 +32,8 @@ Upload to pypi
 --------------
 
     python setup.py register -r pypi
-    python setup.py sdist upload -r pypi
+    python setup.py sdist
+    twine upload dist/*
 
 
 Bump version number, add '-dev'
