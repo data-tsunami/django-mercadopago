@@ -33,7 +33,7 @@ Quick start
 
     DJMERCADOPAGO = {
         'CLIENT_ID': 'YOUR-MERCADOPAGO-CLIENT-ID',
-        'CLIENTE_SECRET': 'YOUR-MERCADOPAGO-SECRET',
+        'CLIENT_SECRET': 'YOUR-MERCADOPAGO-SECRET',
         'SANDBOX_MODE': True,
         'CHECKOUT_PREFERENCE_UPDATER_FUNCTION': 'package.module.to.your.function.defined.in.step.three',
     }

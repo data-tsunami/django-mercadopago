@@ -44,7 +44,7 @@ class TestMercadoPagoService(TestCase):
 
         DJMERCADOPAGO_UNITTEST_SETTINGS = {
             'CLIENT_ID': settings.DJMERCADOPAGO['CLIENT_ID'],
-            'CLIENTE_SECRET': settings.DJMERCADOPAGO['CLIENTE_SECRET'],
+            'CLIENT_SECRET': settings.DJMERCADOPAGO['CLIENT_SECRET'],
             'SANDBOX_MODE': True,  # Always True for unittests
             'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
                 'djmercadopago.tests.update_checkout_preference',
@@ -96,7 +96,7 @@ class TestUpdateCheckoutFunction(TestCase):
 
         DJMERCADOPAGO_UNITTEST_SETTINGS = {
             'CLIENT_ID': settings.DJMERCADOPAGO['CLIENT_ID'],
-            'CLIENTE_SECRET': settings.DJMERCADOPAGO['CLIENTE_SECRET'],
+            'CLIENT_SECRET': settings.DJMERCADOPAGO['CLIENT_SECRET'],
             'SANDBOX_MODE': True,  # Always True for unittests
             'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
                 'djmercadopago.tests.sample_updater_function_raises_exception',

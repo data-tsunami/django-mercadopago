@@ -30,7 +30,7 @@ class DjMercadoLibreSettings(object):
 
     @property
     def client_secret(self):
-        return self._get_attr('CLIENTE_SECRET')
+        return self._get_attr('CLIENT_SECRET')
 
     @property
     def sandbox_mode(self):
