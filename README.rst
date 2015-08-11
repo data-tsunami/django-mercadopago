@@ -107,8 +107,9 @@ updated with the response.
 
 If you need to persist a reference to the ``Payment`` instance, you can register
 to the post_save signal of the model (see:
-https://docs.djangoproject.com/en/1.7/ref/signals/#django.db.models.signals.post_save )
+https://docs.djangoproject.com/en/1.7/ref/signals/#django.db.models.signals.post_save ).
 
+The signal will be generated twice, since save() is called two times.
 
 
 Known issues
