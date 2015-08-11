@@ -56,7 +56,7 @@ Function that populates the `checkout preferences` dict
 
 You can name this function whatever you want, but you need to receive 3 parameters::
 
-    def sample_update_checkout_preference(checkout_preference, param, request):
+    def sample_update_checkout_preference(checkout_preference, checkout_identifier, request):
         (...)
 
 This function is configured in the settings file, in the

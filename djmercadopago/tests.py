@@ -23,7 +23,7 @@ DJMERCADOPAGO_UNITTEST_SETTINGS = {
 }
 
 
-def update_checkout_preference(checkout_preference, param, request):
+def update_checkout_preference(checkout_preference, checkout_identifier, request):
     external_reference = "checkout-id"
     checkout_preference.update({
         "items": [

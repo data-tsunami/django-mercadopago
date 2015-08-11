@@ -155,7 +155,7 @@ class MercadoPagoService(object):
         assert callable(func)
         return func
 
-    def _generate_checkout_preferences(self, user_params, back_urls_builder, request):
+    def _generate_checkout_preferences(self, checkout_identifier, back_urls_builder, request):
         """Returns CheckoutPreference"""
         update_preferences_function = \
             self._get_update_preferences_function()
@@ -163,7 +163,7 @@ class MercadoPagoService(object):
         # FIXME: report detailed error if can't get the function
         checkout_preferences = self._default_checkout_preference_dict(
             back_urls_builder)
-        update_preferences_function(checkout_preferences, user_params, request)
+        update_preferences_function(checkout_preferences, checkout_identifier, request)
 
         return CheckoutPreference(checkout_preferences)
 
@@ -182,14 +182,14 @@ class MercadoPagoService(object):
         mp.sandbox_mode(models.SETTINGS.sandbox_mode)
         return mp
 
-    def do_checkout(self, request, user_params, back_urls_builder):
+    def do_checkout(self, request, checkout_identifier, back_urls_builder):
         """Do the checkout process.
 
         :returns: CheckoutPreferenceResult
         """
         mp = self.get_mercadopago()
         checkout_preferences = self._generate_checkout_preferences(
-            user_params, back_urls_builder, request)
+            checkout_identifier, back_urls_builder, request)
 
         logger.debug("do_checkout(): checkout_preferences:\n%s",
                      checkout_preferences.dump_as_string())
