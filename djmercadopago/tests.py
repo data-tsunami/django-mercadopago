@@ -4,11 +4,38 @@ from __future__ import unicode_literals
 
 import os
 
+from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
+
 
 from djmercadopago.services import (
     MercadoPagoService, BackUrlsBuilder, CheckoutPreferenceResult, SearchResult)
 from djmercadopago.models import Payment
+
+
+DJMERCADOPAGO_UNITTEST_SETTINGS = {
+    'CLIENT_ID': settings.DJMERCADOPAGO['CLIENT_ID'],
+    'CLIENTE_SECRET': settings.DJMERCADOPAGO['CLIENTE_SECRET'],
+    'SANDBOX_MODE': True,  # Always True for unittests
+    'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
+        'djmercadopago.tests.update_checkout_preference',
+}
+
+
+def update_checkout_preference(checkout_preference, param):
+    external_reference = "checkout-id"
+    checkout_preference.update({
+        "items": [
+            {
+                "title": "some product",
+                "quantity": 1,
+                "currency_id": "ARS",
+                "unit_price": 123.45,
+            }
+        ],
+        "external_reference": external_reference,
+    })
 
 
 class BackUrlsBuilderMock(BackUrlsBuilder):
@@ -21,6 +48,7 @@ class BackUrlsBuilderMock(BackUrlsBuilder):
 
 class TestMercadoPagoService(TestCase):
 
+    @override_settings(DJMERCADOPAGO=DJMERCADOPAGO_UNITTEST_SETTINGS)
     def test_checkout_and_search(self):
         service = MercadoPagoService()
 

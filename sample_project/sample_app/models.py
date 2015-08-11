@@ -22,8 +22,37 @@ PRODUCT_LIST = (
 PRODUCTS = dict(PRODUCT_LIST)
 
 
-def update_checkout_preference(checkout_preference, params):
-    product_info = PRODUCTS[params]
+def update_checkout_preference(checkout_preference, param):
+    """
+    This function is configured in the settings file, in the
+    variable 'DJMERCADOPAGO', with key 'CHECKOUT_PREFERENCE_UPDATER_FUNCTION'.
+
+        DJMERCADOPAGO = {
+
+            (...)
+
+            'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
+                'sample_app.models.update_checkout_preference',
+        }
+
+    Parameters
+    ----------
+
+    * `param`: the same string used when created the link to the `djmercadopago:checkout` view.
+               Example: if the URL was generated with:
+
+                   {% url 'djmercadopago:checkout' product_id %}
+
+               the value of `param` would be `product_id`
+
+               You can use the `product_id` to lookup the the product's information
+               in the database.
+    """
+
+    # 'params' is the argument {% url 'djmercadopago:checkout' product.0 %}
+    product_info = PRODUCTS[param]
+
+    # checkout_preference['back_urls']['success'] = reverse('successful_checkout')
 
     external_reference = "payment-for-user-123-{0}".format(uuid.uuid4())
     checkout_preference.update({
