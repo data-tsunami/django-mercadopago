@@ -6,21 +6,13 @@ import os
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 
 from djmercadopago.services import (
     MercadoPagoService, BackUrlsBuilder, CheckoutPreferenceResult, SearchResult)
 from djmercadopago.models import Payment
-
-
-DJMERCADOPAGO_UNITTEST_SETTINGS = {
-    'CLIENT_ID': settings.DJMERCADOPAGO['CLIENT_ID'],
-    'CLIENTE_SECRET': settings.DJMERCADOPAGO['CLIENTE_SECRET'],
-    'SANDBOX_MODE': True,  # Always True for unittests
-    'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
-        'djmercadopago.tests.update_checkout_preference',
-}
 
 
 def update_checkout_preference(checkout_preference, checkout_identifier, request):
@@ -48,32 +40,38 @@ class BackUrlsBuilderMock(BackUrlsBuilder):
 
 class TestMercadoPagoService(TestCase):
 
-    @override_settings(DJMERCADOPAGO=DJMERCADOPAGO_UNITTEST_SETTINGS)
     def test_checkout_and_search(self):
-        service = MercadoPagoService()
 
-        from django.test.client import RequestFactory
+        DJMERCADOPAGO_UNITTEST_SETTINGS = {
+            'CLIENT_ID': settings.DJMERCADOPAGO['CLIENT_ID'],
+            'CLIENTE_SECRET': settings.DJMERCADOPAGO['CLIENTE_SECRET'],
+            'SANDBOX_MODE': True,  # Always True for unittests
+            'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
+                'djmercadopago.tests.update_checkout_preference',
+        }
 
-        request = RequestFactory().get('/')
-        checkout_result = service.do_checkout(request, '', BackUrlsBuilderMock())
+        with override_settings(DJMERCADOPAGO=DJMERCADOPAGO_UNITTEST_SETTINGS):
+            service = MercadoPagoService()
+            request = RequestFactory().get('/')
+            checkout_result = service.do_checkout(request, '', BackUrlsBuilderMock())
 
-        self.assertTrue(checkout_result is not None)
-        self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))
-        self.assertTrue(checkout_result.url)
-        self.assertTrue(checkout_result.external_reference)
-        self.assertTrue(checkout_result.payment)
-        self.assertTrue(checkout_result.payment.id is not None)
+            self.assertTrue(checkout_result is not None)
+            self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))
+            self.assertTrue(checkout_result.url)
+            self.assertTrue(checkout_result.external_reference)
+            self.assertTrue(checkout_result.payment)
+            self.assertTrue(checkout_result.payment.id is not None)
 
-        payment = Payment.objects.get(id=checkout_result.payment.id)
-        self.assertTrue(payment.checkout_preferences)
-        self.assertTrue(payment.checkout_response)
-        self.assertTrue(payment.checkout_response)
+            payment = Payment.objects.get(id=checkout_result.payment.id)
+            self.assertTrue(payment.checkout_preferences)
+            self.assertTrue(payment.checkout_response)
+            self.assertTrue(payment.checkout_response)
 
-        search_result = service.search_payment_by_external_reference(
-            checkout_result.external_reference)
+            search_result = service.search_payment_by_external_reference(
+                checkout_result.external_reference)
 
-        self.assertTrue(search_result is not None)
-        self.assertTrue(isinstance(search_result, SearchResult))
+            self.assertTrue(search_result is not None)
+            self.assertTrue(isinstance(search_result, SearchResult))
 
     def _search_payment_by_external_reference(self):
         """Utility method to be called from CLI. Not a real test"""
@@ -82,3 +80,31 @@ class TestMercadoPagoService(TestCase):
             os.environ['EXTERNAL_REFERENCE'])
         print "------------------------------------------------------------"
         print search_result.dump_as_string()
+
+
+class UpdaterFunctionCalledException(Exception):
+    pass
+
+
+def sample_updater_function_raises_exception(*args, **kwargs):
+    raise UpdaterFunctionCalledException()
+
+
+class TestUpdateCheckoutFunction(TestCase):
+
+    def test_function_is_called(self):
+
+        DJMERCADOPAGO_UNITTEST_SETTINGS = {
+            'CLIENT_ID': settings.DJMERCADOPAGO['CLIENT_ID'],
+            'CLIENTE_SECRET': settings.DJMERCADOPAGO['CLIENTE_SECRET'],
+            'SANDBOX_MODE': True,  # Always True for unittests
+            'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
+                'djmercadopago.tests.sample_updater_function_raises_exception',
+        }
+
+        with override_settings(DJMERCADOPAGO=DJMERCADOPAGO_UNITTEST_SETTINGS):
+            service = MercadoPagoService()
+            request = RequestFactory().get('/')
+
+            with self.assertRaises(UpdaterFunctionCalledException):
+                service.do_checkout(request, '', BackUrlsBuilderMock())
