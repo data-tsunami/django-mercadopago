@@ -6,8 +6,6 @@ from django.core.urlresolvers import reverse
 
 import uuid
 
-from django.core.urlresolvers import reverse
-
 
 PRODUCT_LIST = (
     ('product-1', {
@@ -43,20 +41,29 @@ def update_checkout_preference(checkout_preference, param, request):
     Parameters
     ----------
 
+    * `checkout_preference`: dictionary with the checkout preferences to call the MP api.
+                             You need to populate this object with the required information,
+                             including items, back urls, etc.
+
     * `param`: the same string used when created the link to the `djmercadopago:checkout` view.
                Example: if the URL was generated with:
 
-                   {% url 'djmercadopago:checkout' product_id %}
+                   {% url 'djmercadopago:checkout' purchase_order.id %}
 
-               the value of `param` would be `product_id`
+               the value of `param` would be `purchase_order.id`
 
-               You can use the `product_id` to lookup the the product's information
-               in the database.
+               You can use the `purchase_order.id` to lookup the the products
+               included in the `purchase_order`
+
+    * `request`: this allows you:
+                 (a) to create absolute URLs
+                 (b) get any data from session (in case you use a session-based shopping cart)
+                 (c) get the User (for example, to validate that the current user is
+                     the owner of the `purchase_order`)
     """
 
     # assert request.user.is_authenticated()
 
-    # 'params' is the argument {% url 'djmercadopago:checkout' product.0 %}
     product_info = PRODUCTS[param]
 
     checkout_preference['back_urls']['success'] = request.build_absolute_uri(reverse('successful_checkout'))
