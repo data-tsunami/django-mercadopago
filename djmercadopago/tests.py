@@ -23,7 +23,10 @@ DJMERCADOPAGO_UNITTEST_SETTINGS = {
 }
 
 
-def update_checkout_preference(checkout_preference, param):
+def update_checkout_preference(checkout_preference, param, request):
+
+    # shopping_cart = ShoppingCart.objects.get(pk=int(param))
+
     external_reference = "checkout-id"
     checkout_preference.update({
         "items": [
@@ -52,7 +55,10 @@ class TestMercadoPagoService(TestCase):
     def test_checkout_and_search(self):
         service = MercadoPagoService()
 
-        checkout_result = service.do_checkout('', BackUrlsBuilderMock())
+        from django.test.client import RequestFactory
+
+        request = RequestFactory().get('/')
+        checkout_result = service.do_checkout(request, '', BackUrlsBuilderMock())
 
         self.assertTrue(checkout_result is not None)
         self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))

@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 
 import uuid
 
+from django.core.urlresolvers import reverse
+
+
 PRODUCT_LIST = (
     ('product-1', {
         'NAME': 'T-Shirt',
@@ -22,7 +25,7 @@ PRODUCT_LIST = (
 PRODUCTS = dict(PRODUCT_LIST)
 
 
-def update_checkout_preference(checkout_preference, param):
+def update_checkout_preference(checkout_preference, param, request):
     """
     This function is configured in the settings file, in the
     variable 'DJMERCADOPAGO', with key 'CHECKOUT_PREFERENCE_UPDATER_FUNCTION'.
@@ -49,10 +52,12 @@ def update_checkout_preference(checkout_preference, param):
                in the database.
     """
 
+    assert request.user.is_authenticated()
+
     # 'params' is the argument {% url 'djmercadopago:checkout' product.0 %}
     product_info = PRODUCTS[param]
 
-    # checkout_preference['back_urls']['success'] = reverse('successful_checkout')
+    # checkout_preference['back_urls']['success'] = request.build_absolute_uri(reverse('successful_checkout'))
 
     external_reference = "payment-for-user-123-{0}".format(uuid.uuid4())
     checkout_preference.update({

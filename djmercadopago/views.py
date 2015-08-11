@@ -24,7 +24,8 @@ class CheckoutView(View):
     def get(self, request, *args, **kwargs):
         params = self.kwargs['params']
 
-        result = self.service.do_checkout(params,
+        result = self.service.do_checkout(request,
+                                          params,
                                           BackUrlsBuilder().build(request))
         url = result.url
 
