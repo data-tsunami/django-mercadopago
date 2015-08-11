@@ -99,6 +99,18 @@ This allows you:
 * get the User (for example, to validate that the current user is the owner of the ``purchase_order``)
 
 
+Payment model
+-------------
+
+Before calling MP API, an instance of ``Payment`` is created. The same instances is
+updated with the response.
+
+If you need to persist a reference to the ``Payment`` instance, you can register
+to the post_save signal of the model (see:
+https://docs.djangoproject.com/en/1.7/ref/signals/#django.db.models.signals.post_save )
+
+
+
 Known issues
 ------------
 
