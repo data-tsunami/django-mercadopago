@@ -45,7 +45,7 @@ class TestMercadoPagoService(TestCase):
         with override_settings(DJMERCADOPAGO=DJMERCADOPAGO_UNITTEST_SETTINGS):
             service = MercadoPagoService()
             request = RequestFactory().get('/')
-            checkout_result = service.do_checkout(request, '', back_urls_builder=None)
+            checkout_result = service.do_checkout(request, '')
 
             self.assertTrue(checkout_result is not None)
             self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))
@@ -99,4 +99,4 @@ class TestUpdateCheckoutFunction(TestCase):
             request = RequestFactory().get('/')
 
             with self.assertRaises(UpdaterFunctionCalledException):
-                service.do_checkout(request, '', back_urls_builder=None)
+                service.do_checkout(request, '')
