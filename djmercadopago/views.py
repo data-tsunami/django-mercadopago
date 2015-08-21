@@ -7,7 +7,7 @@ import logging
 from django.http.response import HttpResponseRedirect, HttpResponse
 from django.views.generic.base import View
 
-from djmercadopago.services import MercadoPagoService, BackUrlsBuilder
+from djmercadopago.services import MercadoPagoService
 
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,7 @@ class CheckoutView(View):
         checkout_identifier = self.kwargs['checkout_identifier']
 
         result = self.service.do_checkout(request,
-                                          checkout_identifier,
-                                          BackUrlsBuilder().build(request))
+                                          checkout_identifier)
         url = result.url
         logger.info("Redirecting user '%s' to '%s'", request.user, url)
 

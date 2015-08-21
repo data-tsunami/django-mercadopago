@@ -8,49 +8,11 @@ import logging
 import pprint
 
 import mercadopago
-from django.core.urlresolvers import reverse
 
 from djmercadopago import models
 
 
 logger = logging.getLogger(__name__)
-
-
-class BackUrlsBuilder(object):
-    """Generates the URLs for the 'back-urls'
-    checkout preference
-    """
-
-    def __init__(self):
-        self._success_url = None
-        self._failure_url = None
-        self._pending_url = None
-
-    def build(self,
-              request,
-              success_url=None,
-              failure_url=None,
-              pending_url=None):
-        """Generate default urls"""
-        self._success_url = success_url or request.build_absolute_uri(
-            reverse('djmercadopago:back-urls-success'))
-        self._failure_url = failure_url or request.build_absolute_uri(
-            reverse('djmercadopago:back-urls-failure'))
-        self._pending_url = pending_url or request.build_absolute_uri(
-            reverse('djmercadopago:back-urls-pending'))
-        return self
-
-    @property
-    def success_url(self):
-        return self._success_url
-
-    @property
-    def failure_url(self):
-        return self._failure_url
-
-    @property
-    def pending_url(self):
-        return self._pending_url
 
 
 class CheckoutPreference(object):
@@ -136,14 +98,6 @@ class MercadoPagoService(object):
         # FIXME: implement this
         return date.isoformat(b'T')[0:-7] + ".000+00:00"
 
-    def _default_checkout_preference_dict(self, back_urls_builder):
-        """Generates a checkout preference with default settings"""
-        assert isinstance(back_urls_builder, BackUrlsBuilder)
-        return dict(back_urls=dict(
-            success=back_urls_builder.success_url,
-            failure=back_urls_builder.failure_url,
-            pending=back_urls_builder.pending_url))
-
     def _get_update_preferences_function(self):
         """Returns the functions (implemented by the user) updates
         the checkout preferences dict.
@@ -161,8 +115,7 @@ class MercadoPagoService(object):
             self._get_update_preferences_function()
 
         # FIXME: report detailed error if can't get the function
-        checkout_preferences = self._default_checkout_preference_dict(
-            back_urls_builder)
+        checkout_preferences = {}
         update_preferences_function(checkout_preferences, checkout_identifier, request)
 
         return CheckoutPreference(checkout_preferences)
@@ -176,12 +129,13 @@ class MercadoPagoService(object):
         mp.sandbox_mode(models.SETTINGS.sandbox_mode)
         return mp
 
-    def do_checkout(self, request, checkout_identifier, back_urls_builder):
+    def do_checkout(self, request, checkout_identifier, back_urls_builder=None):
         """Do the checkout process.
 
         :returns: CheckoutPreferenceResult
         """
         mp = self.get_mercadopago()
+
         checkout_preferences = self._generate_checkout_preferences(
             checkout_identifier, back_urls_builder, request)
 

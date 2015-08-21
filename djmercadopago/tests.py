@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 
 from djmercadopago.services import (
-    MercadoPagoService, BackUrlsBuilder, CheckoutPreferenceResult, SearchResult)
+    MercadoPagoService, CheckoutPreferenceResult, SearchResult)
 from djmercadopago.models import Payment
 
 
@@ -30,14 +30,6 @@ def update_checkout_preference(checkout_preference, checkout_identifier, request
     })
 
 
-class BackUrlsBuilderMock(BackUrlsBuilder):
-
-    def __init__(self):
-        self._success_url = 'https://www.google.com/'
-        self._failure_url = 'https://www.google.com/'
-        self._pending_url = 'https://www.google.com/'
-
-
 class TestMercadoPagoService(TestCase):
 
     def test_checkout_and_search(self):
@@ -53,7 +45,7 @@ class TestMercadoPagoService(TestCase):
         with override_settings(DJMERCADOPAGO=DJMERCADOPAGO_UNITTEST_SETTINGS):
             service = MercadoPagoService()
             request = RequestFactory().get('/')
-            checkout_result = service.do_checkout(request, '', BackUrlsBuilderMock())
+            checkout_result = service.do_checkout(request, '', back_urls_builder=None)
 
             self.assertTrue(checkout_result is not None)
             self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))
@@ -107,4 +99,4 @@ class TestUpdateCheckoutFunction(TestCase):
             request = RequestFactory().get('/')
 
             with self.assertRaises(UpdaterFunctionCalledException):
-                service.do_checkout(request, '', BackUrlsBuilderMock())
+                service.do_checkout(request, '', back_urls_builder=None)
