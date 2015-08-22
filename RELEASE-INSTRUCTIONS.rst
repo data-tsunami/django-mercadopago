@@ -45,14 +45,15 @@ Run::
     VER="$(python setup.py --version)" && git tag -a -m "Version ${VER}" "v${VER}"
 
 
-Upload to pypi
---------------
+Push and upload to pypi
+-----------------------
 
 Run::
 
+    git push
     python setup.py register -r pypi
     python setup.py sdist
-    twine upload dist/*
+    twine upload dist/VERSION
 
 
 Bump version number, add '.dev0'
