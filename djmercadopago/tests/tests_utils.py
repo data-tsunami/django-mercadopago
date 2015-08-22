@@ -86,10 +86,18 @@ class BaseDjMercadopagoTestCase(TestCase):
     Base test case for django-mercadopago.
     """
 
+    SAMPLE_APP_DISPATCH_UIDS = [
+        'sample-project-checkout_preferences_created',
+        'sample-project-pre_mp_create_preference',
+        'sample-project-post_mp_create_preference',
+    ]
+
     def _disable_signals(self):
         """Disconnect the signals used in the sample application"""
-        signals.checkout_preferences_created.disconnect(sender=services.MercadoPagoService,
-                                                        dispatch_uid='sample-project-checkout_preferences_created')
+        for dispatch_uid in self.SAMPLE_APP_DISPATCH_UIDS:
+            signals.checkout_preferences_created.disconnect(
+                sender=services.MercadoPagoService,
+                dispatch_uid=dispatch_uid)
 
     def setUp(self):
         self._disable_signals()

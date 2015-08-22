@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.core.urlresolvers import reverse
 from django import dispatch
 
+from djmercadopago import models
 from djmercadopago import services
 from djmercadopago import signals
 
@@ -32,7 +33,7 @@ PRODUCTS = dict(PRODUCT_LIST)
 @dispatch.receiver(signals.checkout_preferences_created,
                    sender=services.MercadoPagoService,
                    dispatch_uid='sample-project-checkout_preferences_created')
-def my_callback(sender, **kwargs):
+def checkout_preferences_created_handler(sender, **kwargs):
     checkout_preferences = kwargs['checkout_preferences']
     user_checkout_identifier = kwargs['user_checkout_identifier']
     request = kwargs['request']
@@ -56,3 +57,36 @@ def my_callback(sender, **kwargs):
         ],
         "external_reference": external_reference,
     })
+
+
+@dispatch.receiver(signals.pre_mp_create_preference,
+                   sender=services.MercadoPagoService,
+                   dispatch_uid='sample-project-pre_mp_create_preference')
+def pre_mp_create_preference_handler(sender, **kwargs):
+    payment = kwargs['payment']
+    user_checkout_identifier = kwargs['user_checkout_identifier']
+    request = kwargs['request']
+
+    assert isinstance(payment, models.Payment)
+
+    #
+    # Here, you can save, in your models, a reference to the 'payment' instance
+    # (the 'payment' instance was already saved, so it has a database 'id').
+    #
+    # At this point, the API call to MP was NOT done yet
+    #
+
+
+@dispatch.receiver(signals.post_mp_create_preference,
+                   sender=services.MercadoPagoService,
+                   dispatch_uid='sample-project-post_mp_create_preference')
+def post_mp_create_preference_handler(sender, **kwargs):
+    payment = kwargs['payment']
+    user_checkout_identifier = kwargs['user_checkout_identifier']
+    request = kwargs['request']
+
+    assert isinstance(payment, models.Payment)
+
+    #
+    # At this point, the API call to MP WAS done
+    #
