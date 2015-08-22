@@ -7,8 +7,7 @@ import os
 from django.test.client import RequestFactory
 
 
-from djmercadopago.services import (
-    MercadoPagoService, CheckoutPreferenceResult, SearchResult)
+from djmercadopago import services
 from djmercadopago.models import Payment
 from djmercadopago import signals
 from djmercadopago import tests_utils
@@ -35,12 +34,12 @@ class TestMercadoPagoService(tests_utils.BaseSignalTestCase):
         })
 
     def test_checkout_and_search_workflow(self):
-        service = MercadoPagoService()
+        service = services.MercadoPagoService()
         request = RequestFactory().get('/')
         checkout_result = service.do_checkout(request, '')
 
         self.assertTrue(checkout_result is not None)
-        self.assertTrue(isinstance(checkout_result, CheckoutPreferenceResult))
+        self.assertTrue(isinstance(checkout_result, services.CheckoutPreferenceResult))
         self.assertTrue(checkout_result.url)
         self.assertTrue(checkout_result.external_reference)
         self.assertTrue(checkout_result.payment)
@@ -55,12 +54,37 @@ class TestMercadoPagoService(tests_utils.BaseSignalTestCase):
             checkout_result.external_reference)
 
         self.assertTrue(search_result is not None)
-        self.assertTrue(isinstance(search_result, SearchResult))
+        self.assertTrue(isinstance(search_result, services.SearchResult))
 
     def _search_payment_by_external_reference(self):
         """Utility method to be called from CLI. Not a real test"""
-        service = MercadoPagoService()
+        service = services.MercadoPagoService()
         search_result = service.search_payment_by_external_reference(
             os.environ['EXTERNAL_REFERENCE'])
         print "------------------------------------------------------------"
         print search_result.dump_as_string()
+
+
+class TestExternalReferenceIsNotRequired(tests_utils.BaseSignalTestCase):
+
+    SIGNAL = signals.checkout_preferences_created
+
+    def signal_callback(self, signal, **kwargs):
+        checkout_preferences = kwargs['checkout_preferences']
+        checkout_preferences.update({
+            "items": [
+                {
+                    "title": "some product",
+                    "quantity": 1,
+                    "currency_id": "ARS",
+                    "unit_price": 123.45,
+                }
+            ],
+        })
+
+    def test(self):
+        service = services.MercadoPagoService()
+        request = RequestFactory().get('/')
+        checkout_preference_result = service.do_checkout(request, '')
+
+        self.assertEqual(checkout_preference_result.external_reference, '')

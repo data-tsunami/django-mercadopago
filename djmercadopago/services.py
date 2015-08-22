@@ -23,9 +23,8 @@ class CheckoutPreference(object):
         self._preferences = checkout_preferences
 
         # FIXME: generate custom exception with better messages
-        # FIXME: add doc about requeriment of 'external_reference'
-        assert self._preferences.get("items")
-        assert "external_reference" in self._preferences
+        if "items" not in self._preferences:
+            logger.warn("The 'checkout preferences' received does NOT have 'items'")
 
     # FIXME: inherit from dict?
 
@@ -35,7 +34,7 @@ class CheckoutPreference(object):
 
     @property
     def external_reference(self):
-        return self._preferences["external_reference"]
+        return self._preferences.get("external_reference", None)
 
     def dump_as_string(self):
         return pprint.pformat(self._preferences)
@@ -134,7 +133,7 @@ class MercadoPagoService(object):
         payment.external_reference = checkout_preferences.external_reference
         payment.save()
 
-        # FIXME: the next generates a http request. This should be executed in Celery
+        # FIXME: the next line generates a http request. This should be executed asynchronously (ej: Celery)
         checkout_preference_result_dict = mp.create_preference(checkout_preferences.preferences)
 
         checkout_preference_result = CheckoutPreferenceResult(
