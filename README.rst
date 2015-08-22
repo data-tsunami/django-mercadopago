@@ -66,13 +66,64 @@ is the ID of some database model, the function that handles the ``checkout_prefe
 signal should check the logged in user has permission to see that shopping cart / purchase order / etc.
 
 Signal: checkout_preferences_created
-++++++++++++++++++++++++++++++++++++
+------------------------------------
+
+This signal is dispatched after the `checkout_preferences` dict is created, and before calling
+the MP api. This allow the user of django-mercadopago to:
+
+* update any `checkout_preferences` parameter
+* add items and prices
+* add back-urls
+* add external reference
+* validate user permissions
+* etc.
+
 
 When the ``checkout_preferences_created`` signal is sent, 3 parameters are provided:
 
 * checkout_preferences
 * user_checkout_identifier
 * request
+
+The recommended way to use it is to connect to the signals in the ``models.py`` module::
+
+    from django import dispatch
+    from djmercadopago import services
+    from djmercadopago import signals
+
+    @dispatch.receiver(signals.checkout_preferences_created,
+                       sender=services.MercadoPagoService,
+                       dispatch_uid='some-id-for-this-signal-handler')
+    def my_checkout_preferences_updater(sender, **kwargs):
+        checkout_preferences = kwargs['checkout_preferences']
+        user_checkout_identifier = kwargs['user_checkout_identifier']
+        request = kwargs['request']
+
+        # Here you can add items, set back-urls, etc.
+
+For example, to set the successful url::
+
+    back_urls = checkout_preferences.get('back_urls', {})
+    checkout_preferences['back_urls'] = back_urls
+    back_urls['success'] = request.build_absolute_uri(reverse('successful_checkout'))
+
+For example, to set the ``items`` to purchase, and the ``external_reference``::
+
+    checkout_preferences.update({
+        "items": [
+            {
+                "title": product_info['NAME'],
+                "quantity": 1,
+                "currency_id": "ARS",
+                "unit_price": product_info['PRICE'],
+            }
+        ],
+        "external_reference": external_reference,
+    })
+
+
+Parameters
+==========
 
 Parameter: checkout_preference
 ******************************

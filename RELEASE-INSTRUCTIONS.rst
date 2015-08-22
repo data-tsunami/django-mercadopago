@@ -1,16 +1,20 @@
 Run unittests
 -------------
 
-Create `sample_project/djmercadopago_sample_app_settings.py` and run:
+Create `sample_project/djmercadopago_sample_app_settings.py` and run::
 
-    PYTHONPATH=. python sample_project/manage.py test djmercadopago
+    tox
+
+Do some manual testing::
+
+    tox -e runserver
 
 
 Remove '-dev' from version
 --------------------------
 
     vim setup.py
-    VER="$(python setup.py --version)" && git commit -m 'Bump version: $VER' setup.py
+    VER="$(python setup.py --version)" && git commit -m "Bump version: $VER" setup.py
 
 
 Upload to pypi TESTING
@@ -37,7 +41,7 @@ Upload to pypi
 
 
 Bump version number, add '.dev0'
--------------------------------
+--------------------------------
 
     vim setup.py
     VER="$(python setup.py --version)" && git commit -m "Bump version: $VER" setup.py
