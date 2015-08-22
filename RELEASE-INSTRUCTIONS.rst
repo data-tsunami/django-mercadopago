@@ -1,7 +1,7 @@
 Run unittests
 -------------
 
-Create `sample_project/djmercadopago_sample_app_settings.py` and run::
+Create ``sample_project/djmercadopago_sample_app_settings.py`` and run the tests with::
 
     tox
 
@@ -13,12 +13,16 @@ Do some manual testing::
 Remove '-dev' from version
 --------------------------
 
+Run::
+
     vim setup.py
     VER="$(python setup.py --version)" && git commit -m "Bump version: $VER" setup.py
 
 
 Upload to pypi TESTING
 ----------------------
+
+Run::
 
     python setup.py register -r pypitest
     python setup.py sdist upload -r pypitest
@@ -29,11 +33,15 @@ Upload to pypi TESTING
 Create Git tag
 --------------
 
+Run::
+
     VER="$(python setup.py --version)" && git tag -a -m "Version ${VER}" "v${VER}"
 
 
 Upload to pypi
 --------------
+
+Run::
 
     python setup.py register -r pypi
     python setup.py sdist
@@ -42,6 +50,8 @@ Upload to pypi
 
 Bump version number, add '.dev0'
 --------------------------------
+
+Run::
 
     vim setup.py
     VER="$(python setup.py --version)" && git commit -m "Bump version: $VER" setup.py
