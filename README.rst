@@ -4,11 +4,15 @@ djmercadopago
 
 djmercadopago is a simple Django app to use MercadoPago
 
-
 THIS IS WIP. THIS DOESN'T WORK YET.
 
 PLEASE, THINK TWICE BEFORE USING THIS ON A PRODUCTION ENVIRONMENT.
 
+Most important things to do:
+
+* document security issues
+* implement exception handling
+* more functional tests
 
 Quick start
 -----------
@@ -71,12 +75,16 @@ Signal: checkout_preferences_created
 This signal is dispatched after the `checkout_preferences` dict is created, and before calling
 the MP api. This allow the user of django-mercadopago to:
 
-* update any `checkout_preferences` parameter
 * add items and prices
+* set `external reference`
 * add back-urls
-* add external reference
+
+Other tasks to do in this signal handler:
+
+* update any other `checkout_preferences` parameter
 * validate user permissions
-* etc.
+* create / update any of your models
+* etc
 
 
 When the ``checkout_preferences_created`` signal is sent, 3 parameters are provided:
@@ -158,7 +166,8 @@ Payment model
 -------------
 
 Before calling MP API, an instance of ``Payment`` is created. The same instances is
-updated with the response.
+updated with the response received from MP. In the instance, the ``external_reference``
+is saved (if you added it to the ``checkout preferences``) to allow you to track payments.
 
 If you need to persist a reference to the ``Payment`` instance, you can register
 to the post_save signal of the model (see:
