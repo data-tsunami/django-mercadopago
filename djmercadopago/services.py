@@ -109,7 +109,7 @@ class MercadoPagoService(object):
         mp.sandbox_mode(models.SETTINGS.sandbox_mode)
         return mp
 
-    def do_checkout(self, request, checkout_identifier):
+    def do_checkout(self, request, user_checkout_identifier):
         """Do the checkout process.
 
         :returns: CheckoutPreferenceResult
@@ -120,7 +120,7 @@ class MercadoPagoService(object):
         signals.checkout_preferences_created.send(
             sender=self.__class__,
             checkout_preferences=checkout_preferences_dict,
-            user_checkout_identifier=checkout_identifier,
+            user_checkout_identifier=user_checkout_identifier,
             request=request
         )
 

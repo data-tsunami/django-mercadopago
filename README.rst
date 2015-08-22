@@ -77,8 +77,8 @@ Dictionary with the checkout preferences to call the MP api.
 You need to populate this object with the required information,
 including items, back urls, etc.
 
-Parameter: checkout_identifier
-******************************
+Parameter: user_checkout_identifier
+***********************************
 
 The same string used when created the link to the ``djmercadopago:checkout`` view.
 
@@ -86,7 +86,7 @@ Example: if the URL was generated with::
 
    {% url 'djmercadopago:checkout' purchase_order.id %}
 
-the value of ``checkout_identifier`` would be the value of ``purchase_order.id``
+the value of ``user_checkout_identifier`` would be the value of ``purchase_order.id``
 
 Parameter: request
 ******************

@@ -22,10 +22,10 @@ class CheckoutView(View):
         self.service = MercadoPagoService()
 
     def get(self, request, *args, **kwargs):
-        checkout_identifier = self.kwargs['checkout_identifier']
+        user_checkout_identifier = self.kwargs['user_checkout_identifier']
 
         result = self.service.do_checkout(request,
-                                          checkout_identifier)
+                                          user_checkout_identifier)
         url = result.url
         logger.info("Redirecting user '%s' to '%s'", request.user, url)
 

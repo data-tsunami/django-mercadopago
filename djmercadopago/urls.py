@@ -11,7 +11,7 @@ from djmercadopago.views import (CheckoutView,
 
 urlpatterns = patterns(
     '',
-    url(r'^checkout/(?P<checkout_identifier>.+)/$',
+    url(r'^checkout/(?P<user_checkout_identifier>.+)/$',
         CheckoutView.as_view(),
         name='checkout'),
 
