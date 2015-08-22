@@ -2,14 +2,14 @@
 
 from __future__ import unicode_literals
 
-from copy import deepcopy
-import importlib
 import logging
 import pprint
+from copy import deepcopy
 
 import mercadopago
 
 from djmercadopago import models
+from djmercadopago import signals
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,8 @@ class CheckoutPreference(object):
         # FIXME: add doc about requeriment of 'external_reference'
         assert self._preferences.get("items")
         assert "external_reference" in self._preferences
+
+    # FIXME: inherit from dict?
 
     @property
     def preferences(self):
@@ -98,27 +100,7 @@ class MercadoPagoService(object):
         # FIXME: implement this
         return date.isoformat(b'T')[0:-7] + ".000+00:00"
 
-    def _get_update_preferences_function(self):
-        """Returns the functions (implemented by the user) updates
-        the checkout preferences dict.
-        """
-        function_string = models.SETTINGS.checkout_preference_updater_function
-        mod_name, func_name = function_string.rsplit('.', 1)
-        mod = importlib.import_module(mod_name)
-        func = getattr(mod, func_name)
-        assert callable(func)
-        return func
-
-    def _generate_checkout_preferences(self, checkout_identifier, request):
-        """Returns CheckoutPreference"""
-        update_preferences_function = \
-            self._get_update_preferences_function()
-
-        # FIXME: report detailed error if can't get the function
-        checkout_preferences = {}
-        update_preferences_function(checkout_preferences, checkout_identifier, request)
-
-        return CheckoutPreference(checkout_preferences)
+    # FIXME: remove SETTINGS.checkout_preference_updater_function
 
     def get_mercadopago(self):
         """Returns MP instance"""
@@ -136,8 +118,15 @@ class MercadoPagoService(object):
         """
         mp = self.get_mercadopago()
 
-        checkout_preferences = self._generate_checkout_preferences(
-            checkout_identifier, request)
+        checkout_preferences_dict = {}
+        signals.checkout_preferences_created.send(
+            sender=self.__class__,
+            checkout_preferences=checkout_preferences_dict,
+            user_checkout_identifier=checkout_identifier,
+            request=request
+        )
+
+        checkout_preferences = CheckoutPreference(checkout_preferences_dict)
 
         logger.debug("do_checkout(): checkout_preferences:\n%s",
                      checkout_preferences.dump_as_string())

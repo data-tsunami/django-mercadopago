@@ -39,11 +39,6 @@ class DjMercadoLibreSettings(object):
             raise exceptions.ImproperlyConfigured("Value for 'DJMERCADOPAGO.SANDBOX_MODE' must be a boolean")
         return sandbox_mode
 
-    @property
-    def checkout_preference_updater_function(self):
-        # FIXME: validate that the function referenced by '_checkout_preference_updater_function' exists
-        return self._get_attr('CHECKOUT_PREFERENCE_UPDATER_FUNCTION')
-
 
 SETTINGS = DjMercadoLibreSettings()
 
