@@ -169,9 +169,8 @@ Before calling MP API, an instance of ``Payment`` is created. The same instances
 updated with the response received from MP. In the instance, the ``external_reference``
 is saved (if you added it to the ``checkout preferences``) to allow you to track payments.
 
-If you need to persist a reference to the ``Payment`` instance, you can register
-to the post_save signal of the model (see:
-https://docs.djangoproject.com/en/1.7/ref/signals/#django.db.models.signals.post_save ).
+If you need to save a reference to the ``Payment`` instance, you can register
+to the ``pre_mp_create_preference`` and/or ``post_mp_create_preference`` signals.
 
 The signal will be generated twice, since save() is called two times.
 
