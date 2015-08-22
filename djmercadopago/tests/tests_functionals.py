@@ -8,9 +8,9 @@ from unittest.case import skipIf
 from django.test.client import RequestFactory
 
 from djmercadopago import services
-from djmercadopago.models import Payment
 from djmercadopago import signals
-from djmercadopago import tests_utils
+from djmercadopago.models import Payment
+from djmercadopago.tests import tests_utils
 
 
 @skipIf(os.environ.get('RUN_FUNC_TEST', '').lower() == 'false',

@@ -6,9 +6,8 @@ import uuid
 
 from django.test.client import RequestFactory
 
-from djmercadopago import services
 from djmercadopago import signals
-from djmercadopago import tests_utils
+from djmercadopago.tests import tests_utils
 
 
 class UpdaterFunctionCalledException(Exception):

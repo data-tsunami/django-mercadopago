@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.test.client import RequestFactory
 
 from djmercadopago import signals
-from djmercadopago import tests_utils
+from djmercadopago.tests import tests_utils
 
 
 class TestExternalReferenceIsNotRequired(tests_utils.BaseSignalTestCase):
