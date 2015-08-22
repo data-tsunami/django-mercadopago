@@ -70,3 +70,41 @@ class TestCheckoutPreferencesCreatedSignalParameters(tests_utils.BaseSignalTestC
 
         service.do_checkout(request, checkout_id)
         self.assertListEqual(self.checkout_ids, [checkout_id])
+
+
+# ----------------------------------------------------------------------
+# SIGNAL: pre_mp_create_preference
+# ----------------------------------------------------------------------
+
+class TestPreMpCreatePreferenceSignalHandlerIsCalled(tests_utils.BaseSignalTestCase):
+
+    pre_mp_create_preference_handler = mock.Mock()
+
+    SIGNALS = [
+        [signals.pre_mp_create_preference, 'pre_mp_create_preference_handler']
+    ]
+
+    def test(self):
+        service = tests_utils.MercadoPagoServiceMock()
+        service.do_checkout(RequestFactory().get('/'), '')
+
+        self.assertEqual(self.pre_mp_create_preference_handler.call_count, 1)
+
+
+# ----------------------------------------------------------------------
+# SIGNAL: post_mp_create_preference
+# ----------------------------------------------------------------------
+
+class TestPostMpCreatePreferenceSignalHandlerIsCalled(tests_utils.BaseSignalTestCase):
+
+    post_mp_create_preference_handler = mock.Mock()
+
+    SIGNALS = [
+        [signals.post_mp_create_preference, 'post_mp_create_preference_handler']
+    ]
+
+    def test(self):
+        service = tests_utils.MercadoPagoServiceMock()
+        service.do_checkout(RequestFactory().get('/'), '')
+
+        self.assertEqual(self.post_mp_create_preference_handler.call_count, 1)
