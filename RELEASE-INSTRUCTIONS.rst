@@ -10,6 +10,13 @@ Do some manual testing::
     tox -e runserver
 
 
+Create migrations
+-----------------
+
+Run::
+
+    tox -e makemigrations
+
 Remove '-dev' from version
 --------------------------
 
