@@ -87,7 +87,7 @@ class TestExternalReferenceIsNotRequired(tests_utils.BaseSignalTestCase):
         })
 
     def test(self):
-        service = services.MercadoPagoService()
+        service = tests_utils.MercadoPagoServiceMock()
         request = RequestFactory().get('/')
         checkout_preference_result = service.do_checkout(request, '')
 

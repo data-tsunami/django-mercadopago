@@ -25,7 +25,7 @@ class TestCheckoutPreferencesCreatedSignalHandlerIsCalled(tests_utils.BaseSignal
         raise UpdaterFunctionCalledException()
 
     def test(self):
-        service = services.MercadoPagoService()
+        service = tests_utils.MercadoPagoServiceMock()
         request = RequestFactory().get('/')
 
         with self.assertRaises(UpdaterFunctionCalledException):
@@ -67,7 +67,7 @@ class TestCheckoutPreferencesCreatedSignalParameters(tests_utils.BaseSignalTestC
 
     def test(self):
         checkout_id = uuid.uuid4().hex
-        service = services.MercadoPagoService()
+        service = tests_utils.MercadoPagoServiceMock()
         request = RequestFactory().get('/')
 
         service.do_checkout(request, checkout_id)
