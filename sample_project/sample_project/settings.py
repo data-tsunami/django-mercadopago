@@ -28,7 +28,6 @@ ALLOWED_HOSTS = []
 
 MIGRATION_MODULES = {
     "sample_app": "migrations",
-    "djmercadopago": "migrations",
 }
 
 # Application definition
