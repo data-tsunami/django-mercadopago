@@ -15,9 +15,11 @@ from djmercadopago import tests_utils
 
 class TestMercadoPagoService(tests_utils.BaseSignalTestCase):
 
-    SIGNAL = signals.checkout_preferences_created
+    SIGNALS = [
+        [signals.checkout_preferences_created, 'checkout_preferences_created_handler']
+    ]
 
-    def signal_callback(self, signal, **kwargs):
+    def checkout_preferences_created_handler(self, signal, **kwargs):
         checkout_preferences = kwargs['checkout_preferences']
 
         external_reference = "checkout-id"
@@ -67,9 +69,11 @@ class TestMercadoPagoService(tests_utils.BaseSignalTestCase):
 
 class TestExternalReferenceIsNotRequired(tests_utils.BaseSignalTestCase):
 
-    SIGNAL = signals.checkout_preferences_created
+    SIGNALS = [
+        [signals.checkout_preferences_created, 'checkout_preferences_created_handler']
+    ]
 
-    def signal_callback(self, signal, **kwargs):
+    def checkout_preferences_created_handler(self, signal, **kwargs):
         checkout_preferences = kwargs['checkout_preferences']
         checkout_preferences.update({
             "items": [

@@ -16,6 +16,7 @@ class BaseDjMercadopagoTestCase(TestCase):
     """
 
     def _disable_signals(self):
+        """Disconnect the signals used in the sample application"""
         signals.checkout_preferences_created.disconnect(sender=services.MercadoPagoService,
                                                         dispatch_uid='sample-project-checkout_preferences_created')
 
@@ -30,22 +31,29 @@ class BaseSignalTestCase(BaseDjMercadopagoTestCase):
     Subclasses should implement `signal_callback()`
     """
 
-    SIGNAL = None
+    SIGNALS = None
 
     def setUp(self):
         super(BaseSignalTestCase, self).setUp()
-        if self.SIGNAL is None:
-            raise AttributeError("Should set SIGNAL attribute")
-        self.dispatch_uid = uuid.uuid4().hex
-        self.checkout_preferences_created_signal = self.SIGNAL.connect(
-            self.signal_callback,
-            sender=services.MercadoPagoService,
-            dispatch_uid=self.dispatch_uid
-        )
+        if self.SIGNALS is None:
+            raise AttributeError("Should set SIGNALS attribute")
+
+        self.dispatch_uids = []
+
+        for signal, handler_name in self.SIGNALS:
+            handler = getattr(self, handler_name)
+            dispatch_uid = uuid.uuid4().hex
+            signal.connect(
+                handler,
+                sender=services.MercadoPagoService,
+                dispatch_uid=dispatch_uid
+            )
+            self.dispatch_uids.append(dispatch_uid)
 
     def tearDown(self):
-        signals.checkout_preferences_created.disconnect(sender=services.MercadoPagoService,
-                                                        dispatch_uid=self.dispatch_uid)
+        for dispatch_uid in self.dispatch_uids:
+            signals.checkout_preferences_created.disconnect(sender=services.MercadoPagoService,
+                                                            dispatch_uid=dispatch_uid)
 
     def signal_callback(self, signal, **kwargs):
         raise NotImplemented()

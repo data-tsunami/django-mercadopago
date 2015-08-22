@@ -17,9 +17,11 @@ class UpdaterFunctionCalledException(Exception):
 
 class TestCheckoutPreferencesCreatedSignalHandlerIsCalled(tests_utils.BaseSignalTestCase):
 
-    SIGNAL = signals.checkout_preferences_created
+    SIGNALS = [
+        [signals.checkout_preferences_created, 'checkout_preferences_created_handler']
+    ]
 
-    def signal_callback(self, signal, **kwargs):
+    def checkout_preferences_created_handler(self, signal, **kwargs):
         raise UpdaterFunctionCalledException()
 
     def test(self):
@@ -32,13 +34,15 @@ class TestCheckoutPreferencesCreatedSignalHandlerIsCalled(tests_utils.BaseSignal
 
 class TestCheckoutPreferencesCreatedSignalParameters(tests_utils.BaseSignalTestCase):
 
-    SIGNAL = signals.checkout_preferences_created
+    SIGNALS = [
+        [signals.checkout_preferences_created, 'checkout_preferences_created_handler']
+    ]
 
     def setUp(self):
         super(TestCheckoutPreferencesCreatedSignalParameters, self).setUp()
         self.checkout_ids = []
 
-    def signal_callback(self, signal, **kwargs):
+    def checkout_preferences_created_handler(self, signal, **kwargs):
         checkout_preferences = kwargs['checkout_preferences']
         user_checkout_identifier = kwargs['user_checkout_identifier']
         request = kwargs['request']
