@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import uuid
+import mock
 
 from django.test.client import RequestFactory
 
@@ -10,25 +11,23 @@ from djmercadopago import signals
 from djmercadopago.tests import tests_utils
 
 
-class UpdaterFunctionCalledException(Exception):
-    pass
-
+# ----------------------------------------------------------------------
+# SIGNAL: checkout_preferences_created
+# ----------------------------------------------------------------------
 
 class TestCheckoutPreferencesCreatedSignalHandlerIsCalled(tests_utils.BaseSignalTestCase):
+
+    checkout_preferences_created_handler = mock.Mock()
 
     SIGNALS = [
         [signals.checkout_preferences_created, 'checkout_preferences_created_handler']
     ]
 
-    def checkout_preferences_created_handler(self, signal, **kwargs):
-        raise UpdaterFunctionCalledException()
-
     def test(self):
         service = tests_utils.MercadoPagoServiceMock()
-        request = RequestFactory().get('/')
+        service.do_checkout(RequestFactory().get('/'), '')
 
-        with self.assertRaises(UpdaterFunctionCalledException):
-            service.do_checkout(request, '')
+        self.assertEqual(self.checkout_preferences_created_handler.call_count, 1)
 
 
 class TestCheckoutPreferencesCreatedSignalParameters(tests_utils.BaseSignalTestCase):
