@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.core.urlresolvers import reverse
 from django import dispatch
 
@@ -38,6 +40,8 @@ def checkout_preferences_created_handler(sender, **kwargs):
     user_checkout_identifier = kwargs['user_checkout_identifier']
     request = kwargs['request']
 
+    logging.info("SIGNAL: checkout_preferences_created: creating preferences...")
+
     # assert request.user.is_authenticated()
     product_info = PRODUCTS[user_checkout_identifier]
 
@@ -69,6 +73,8 @@ def pre_mp_create_preference_handler(sender, **kwargs):
 
     assert isinstance(payment, models.Payment)
 
+    logging.info("SIGNAL: pre_mp_create_preference: Using payment %s", payment.id)
+
     #
     # Here, you can save, in your models, a reference to the 'payment' instance
     # (the 'payment' instance was already saved, so it has a database 'id').
@@ -87,6 +93,8 @@ def post_mp_create_preference_handler(sender, **kwargs):
     request = kwargs['request']
 
     assert isinstance(payment, models.Payment)
+
+    logging.info("SIGNAL: post_mp_create_preference: API call to MP done. Payment: %s", payment.id)
 
     #
     # At this point, the API call to MP WAS done.
