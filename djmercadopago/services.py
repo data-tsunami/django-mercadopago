@@ -95,29 +95,23 @@ class SearchResult(object):
 
 class MercadoPagoService(object):
 
+    def __init__(self):
+        self.mp = mercadopago.MP(models.SETTINGS.client_id, models.SETTINGS.client_secret)
+        logger.debug("Returning MP instance with sandbox_mode: %s", models.SETTINGS.sandbox_mode)
+        self.mp.sandbox_mode(models.SETTINGS.sandbox_mode)
+
     def get_as_iso8601(self, date):
         # FIXME: implement this
         return date.isoformat(b'T')[0:-7] + ".000+00:00"
-
-    def get_mercadopago(self):
-        """Returns MP instance"""
-        mp = mercadopago.MP(models.SETTINGS.client_id,
-                            models.SETTINGS.client_secret)
-        logger.debug("Returning MP instance with sandbox_mode: %s",
-                     models.SETTINGS.sandbox_mode)
-        mp.sandbox_mode(models.SETTINGS.sandbox_mode)
-        return mp
 
     def do_checkout(self, request, user_checkout_identifier):
         """Do the checkout process.
 
         :returns: CheckoutPreferenceResult
         """
-        mp = self.get_mercadopago()
-
         checkout_preferences_dict = {}
         signals.checkout_preferences_created.send(
-            sender=self.__class__,
+            sender=MercadoPagoService,
             checkout_preferences=checkout_preferences_dict,
             user_checkout_identifier=user_checkout_identifier,
             request=request
@@ -125,8 +119,7 @@ class MercadoPagoService(object):
 
         checkout_preferences = CheckoutPreference(checkout_preferences_dict)
 
-        logger.debug("do_checkout(): checkout_preferences:\n%s",
-                     checkout_preferences.dump_as_string())
+        logger.debug("do_checkout(): checkout_preferences:\n%s", checkout_preferences.dump_as_string())
 
         payment = models.Payment()
         payment.checkout_preferences = checkout_preferences.dump_as_string()
@@ -134,7 +127,7 @@ class MercadoPagoService(object):
         payment.save()
 
         signals.pre_mp_create_preference.send(
-            sender=self.__class__,
+            sender=MercadoPagoService,
             payment=payment,
             user_checkout_identifier=user_checkout_identifier,
             request=request
@@ -142,19 +135,18 @@ class MercadoPagoService(object):
 
         # FIXME: the next line generates a http request. This should be executed asynchronously (ej: Celery)
         # FIXME: in case of error, it shoud be saved in 'checkout_response'?
-        checkout_preference_result_dict = mp.create_preference(checkout_preferences.preferences)
+        checkout_preference_result_dict = self.mp.create_preference(checkout_preferences.preferences)
 
         checkout_preference_result = CheckoutPreferenceResult(
             checkout_preference_result_dict, payment)
 
-        logger.debug("do_checkout(): checkout_preference_result:\n%s",
-                     checkout_preference_result.dump_as_string())
+        logger.debug("do_checkout(): checkout_preference_result:\n%s", checkout_preference_result.dump_as_string())
 
         payment.checkout_response = checkout_preference_result.dump_as_string()
         payment.save()
 
         signals.post_mp_create_preference.send(
-            sender=self.__class__,
+            sender=MercadoPagoService,
             payment=payment,
             user_checkout_identifier=user_checkout_identifier,
             request=request
@@ -167,8 +159,6 @@ class MercadoPagoService(object):
 
         :returns: SearchResult
         """
-        mp = self.get_mercadopago()
-
         filters = {
             "site_id": "MLA",  # Argentina: MLA; Brasil: MLB
             "external_reference": external_reference,
@@ -179,11 +169,9 @@ class MercadoPagoService(object):
                      "filters:\n%s",
                      filters)
 
-        search_result_dict = mp.search_payment(filters)
+        search_result_dict = self.mp.search_payment(filters)
         search_result = SearchResult(search_result_dict)
 
-        logger.debug("search_payment_by_external_reference(): "
-                     "search_result:\n%s",
-                     search_result.dump_as_string())
+        logger.debug("search_payment_by_external_reference(): search_result:\n%s", search_result.dump_as_string())
 
         return search_result
