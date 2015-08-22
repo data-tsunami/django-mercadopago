@@ -133,6 +133,13 @@ class MercadoPagoService(object):
         payment.external_reference = checkout_preferences.external_reference
         payment.save()
 
+        signals.pre_mp_create_preference.send(
+            sender=self.__class__,
+            payment=payment,
+            user_checkout_identifier=user_checkout_identifier,
+            request=request
+        )
+
         # FIXME: the next line generates a http request. This should be executed asynchronously (ej: Celery)
         # FIXME: in case of error, it shoud be saved in 'checkout_response'?
         checkout_preference_result_dict = mp.create_preference(checkout_preferences.preferences)
@@ -145,6 +152,13 @@ class MercadoPagoService(object):
 
         payment.checkout_response = checkout_preference_result.dump_as_string()
         payment.save()
+
+        signals.post_mp_create_preference.send(
+            sender=self.__class__,
+            payment=payment,
+            user_checkout_identifier=user_checkout_identifier,
+            request=request
+        )
 
         return checkout_preference_result
 
