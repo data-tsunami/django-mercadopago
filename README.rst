@@ -24,10 +24,21 @@ Quick start
 
     url(r'^mp/', include('djmercadopago.urls', namespace="djmercadopago")),
 
-3. Implement the function that populates the **checkout preferences** dict::
+3. Implement the function that populates the **checkout preferences** dict, and attach it to the signal::
 
-    url(r'^mp/', include('djmercadopago.urls', namespace="djmercadopago")),
+    from django import dispatch
+    from djmercadopago import services
+    from djmercadopago import signals
 
+    @dispatch.receiver(signals.checkout_preferences_created,
+                       sender=services.MercadoPagoService,
+                       dispatch_uid='some-id-for-this-signal-handler')
+    def my_checkout_preferences_updater(sender, **kwargs):
+        checkout_preferences = kwargs['checkout_preferences']
+        user_checkout_identifier = kwargs['user_checkout_identifier']
+        request = kwargs['request']
+
+        # Here you can add items, set back-urls, etc.
 
 4. Configure your settings::
 
@@ -35,7 +46,6 @@ Quick start
         'CLIENT_ID': 'YOUR-MERCADOPAGO-CLIENT-ID',
         'CLIENT_SECRET': 'YOUR-MERCADOPAGO-SECRET',
         'SANDBOX_MODE': True,
-        'CHECKOUT_PREFERENCE_UPDATER_FUNCTION': 'package.module.to.your.function.defined.in.step.three',
     }
 
 5. Run **python manage.py migrate** to create the djmercadopago models.
@@ -54,22 +64,11 @@ If you have the shopping cart contents in session, you won't need an identifier.
 Function that populates the `checkout preferences` dict
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-You can name this function whatever you want, but you need to receive 3 parameters::
+When the ``checkout_preferences_created`` signal is sent, 3 parameters are provided:
 
-    def sample_update_checkout_preference(checkout_preference, checkout_identifier, request):
-        (...)
-
-This function is configured in the settings file, in the
-variable 'DJMERCADOPAGO', with key 'CHECKOUT_PREFERENCE_UPDATER_FUNCTION'::
-
-    DJMERCADOPAGO = {
-
-        (...)
-
-        'CHECKOUT_PREFERENCE_UPDATER_FUNCTION':
-            'MYAPP.MYMODULE.sample_update_checkout_preference',
-    }
-
+    * checkout_preferences
+    * user_checkout_identifier
+    * request
 
 Parameter: checkout_preference
 ******************************

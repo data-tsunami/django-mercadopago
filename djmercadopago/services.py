@@ -100,8 +100,6 @@ class MercadoPagoService(object):
         # FIXME: implement this
         return date.isoformat(b'T')[0:-7] + ".000+00:00"
 
-    # FIXME: remove SETTINGS.checkout_preference_updater_function
-
     def get_mercadopago(self):
         """Returns MP instance"""
         mp = mercadopago.MP(models.SETTINGS.client_id,
