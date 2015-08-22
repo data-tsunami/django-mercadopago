@@ -148,6 +148,7 @@ class MercadoPagoService(object):
         signals.post_mp_create_preference.send(
             sender=MercadoPagoService,
             payment=payment,
+            create_preference_result=checkout_preference_result_dict,
             user_checkout_identifier=user_checkout_identifier,
             request=request
         )

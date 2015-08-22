@@ -144,14 +144,17 @@ class TestPostMpCreatePreferenceSignalParameters(tests_utils.BaseSignalTestCase)
 
     def post_mp_create_preference_handler(self, signal, **kwargs):
         payment = kwargs['payment']
+        create_preference_result = kwargs['create_preference_result']
         user_checkout_identifier = kwargs['user_checkout_identifier']
         request = kwargs['request']
 
         self.assertIsNotNone(payment)
+        self.assertIsNotNone(create_preference_result)
         self.assertIsNotNone(user_checkout_identifier)
         self.assertIsNotNone(request)
 
         self.assertTrue(isinstance(payment, models.Payment))
+        self.assertTrue(isinstance(create_preference_result, dict))
         self.assertTrue(payment.id > 0)
         self.assertTrue(payment.checkout_preferences)
         self.assertTrue(payment.checkout_response)

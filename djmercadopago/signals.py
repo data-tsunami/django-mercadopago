@@ -14,5 +14,6 @@ pre_mp_create_preference = dispatch.Signal(providing_args=["payment",
                                                            "request"])
 
 post_mp_create_preference = dispatch.Signal(providing_args=["payment",
+                                                            "create_preference_result",
                                                             "user_checkout_identifier",
                                                             "request"])

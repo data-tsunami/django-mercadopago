@@ -73,7 +73,7 @@ def pre_mp_create_preference_handler(sender, **kwargs):
     # Here, you can save, in your models, a reference to the 'payment' instance
     # (the 'payment' instance was already saved, so it has a database 'id').
     #
-    # At this point, the API call to MP was NOT done yet
+    # At this point, the API call to `mercadopago.MP().create_preference()` was NOT done yet
     #
 
 
@@ -82,11 +82,14 @@ def pre_mp_create_preference_handler(sender, **kwargs):
                    dispatch_uid='sample-project-post_mp_create_preference')
 def post_mp_create_preference_handler(sender, **kwargs):
     payment = kwargs['payment']
+    create_preference_result = kwargs['create_preference_result']
     user_checkout_identifier = kwargs['user_checkout_identifier']
     request = kwargs['request']
 
     assert isinstance(payment, models.Payment)
 
     #
-    # At this point, the API call to MP WAS done
+    # At this point, the API call to MP WAS done.
+    #
+    # `create_preference_result` is the dict returned by `mercadopago.MP().create_preference()`
     #
