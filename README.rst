@@ -24,7 +24,7 @@ Quick start
 
     url(r'^mp/', include('djmercadopago.urls', namespace="djmercadopago")),
 
-3. Implement the function that populates the **checkout preferences** dict, and attach it to the signal::
+3. Connect to the 'checkout_preferences_created' signal, to update the **checkout preferences**::
 
     from django import dispatch
     from djmercadopago import services
@@ -52,23 +52,27 @@ Quick start
 
 6. In your template, add a link to the checkout view::
 
-    <a href="{% url 'djmercadopago:checkout' 'CHECKOUT_ID' %}">Checkout</a>
+    <a href="{% url 'djmercadopago:checkout' 'USER_CHECKOUT_IDENTIFIER' %}">Checkout</a>
 
 
-The ``CHECKOUT_ID`` is some identifier of the shopping cart, or purchase order, or whatever you
+The ``USER_CHECKOUT_IDENTIFIER`` is some identifier of the shopping cart, or purchase order, or whatever you
 use to hold the items the user wants to pay. This identifier is passed to the function that populates
 the ``checkout preferences`` dict, so you can query the database using that identifier.
 
 If you have the shopping cart contents in session, you won't need an identifier.
 
-Function that populates the `checkout preferences` dict
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Security considerations: since this identifier is used in an URL, anyone can try to guess it. If the identifier
+is the ID of some database model, the function that handles the ``checkout_preferences_created``
+signal should check the logged in user has permission to see that shopping cart / purchase order / etc.
+
+Signal: checkout_preferences_created
+++++++++++++++++++++++++++++++++++++
 
 When the ``checkout_preferences_created`` signal is sent, 3 parameters are provided:
 
-    * checkout_preferences
-    * user_checkout_identifier
-    * request
+* checkout_preferences
+* user_checkout_identifier
+* request
 
 Parameter: checkout_preference
 ******************************
@@ -95,7 +99,8 @@ This allows you:
 
 * to create absolute URLs
 * get any data from session (in case you use a session-based shopping cart)
-* get the User (for example, to validate that the current user is the owner of the ``purchase_order``)
+* get the User (for example, to validate that the current user is the owner of the
+  items identified by ``user_checkout_identifier``)
 
 
 Payment model
