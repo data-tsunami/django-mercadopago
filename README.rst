@@ -8,11 +8,22 @@ THIS IS WIP. THIS DOESN'T WORK YET.
 
 PLEASE, THINK TWICE BEFORE USING THIS ON A PRODUCTION ENVIRONMENT.
 
-Most important things to do:
+Most important things to do to get a 'beta' version:
 
 * document security issues
+* implement views to receive MP requests
 * implement exception handling
-* more functional tests
+* more functional tests / Selenium tests
+* separate sample app from unittests
+* create a more complete sample app
+* use autocommit-style transactions for the djmercadopago:checkout view
+
+Other ideas:
+
+* implement support for 'customized checkout'
+* support Django 1.8
+* support Python 3
+* setup travis-ci
 
 Quick start
 -----------
@@ -205,11 +216,3 @@ Parameter: create_preference_result
 ***********************************
 
 The dict returned by ``mercadopago.MP().create_preference()``.
-
-
-Known issues
-------------
-
-* Transactions should be atomic
-    See: https://docs.djangoproject.com/en/1.7/topics/db/transactions/#django.db.transaction.non_atomic_requests
-* Supports Python 2.7 and Django 1.7 only
