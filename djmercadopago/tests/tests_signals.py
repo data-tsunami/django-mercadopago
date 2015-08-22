@@ -7,6 +7,7 @@ import mock
 
 from django.test.client import RequestFactory
 
+from djmercadopago import models
 from djmercadopago import signals
 from djmercadopago.tests import tests_utils
 
@@ -23,7 +24,7 @@ class TestCheckoutPreferencesCreatedSignalHandlerIsCalled(tests_utils.BaseSignal
         [signals.checkout_preferences_created, 'checkout_preferences_created_handler']
     ]
 
-    def test(self):
+    def test_checkout_preferences_created_is_called(self):
         service = tests_utils.MercadoPagoServiceMock()
         service.do_checkout(RequestFactory().get('/'), '')
 
@@ -63,7 +64,7 @@ class TestCheckoutPreferencesCreatedSignalParameters(tests_utils.BaseSignalTestC
 
         self.checkout_ids.append(user_checkout_identifier)
 
-    def test(self):
+    def test_checkout_preferences_created_parameters(self):
         checkout_id = uuid.uuid4().hex
         service = tests_utils.MercadoPagoServiceMock()
         request = RequestFactory().get('/')
@@ -84,11 +85,36 @@ class TestPreMpCreatePreferenceSignalHandlerIsCalled(tests_utils.BaseSignalTestC
         [signals.pre_mp_create_preference, 'pre_mp_create_preference_handler']
     ]
 
-    def test(self):
+    def test_pre_mp_create_preference_is_called(self):
         service = tests_utils.MercadoPagoServiceMock()
         service.do_checkout(RequestFactory().get('/'), '')
 
         self.assertEqual(self.pre_mp_create_preference_handler.call_count, 1)
+
+
+class TestPreMpCreatePreferenceSignalParameters(tests_utils.BaseSignalTestCase):
+
+    SIGNALS = [
+        [signals.pre_mp_create_preference, 'pre_mp_create_preference_handler']
+    ]
+
+    def pre_mp_create_preference_handler(self, signal, **kwargs):
+        payment = kwargs['payment']
+        user_checkout_identifier = kwargs['user_checkout_identifier']
+        request = kwargs['request']
+
+        self.assertIsNotNone(payment)
+        self.assertIsNotNone(user_checkout_identifier)
+        self.assertIsNotNone(request)
+
+        self.assertTrue(isinstance(payment, models.Payment))
+        self.assertTrue(payment.id > 0)
+        self.assertTrue(payment.checkout_preferences)
+        self.assertFalse(payment.checkout_response)
+
+    def test_pre_mp_create_preference_parameters(self):
+        service = tests_utils.MercadoPagoServiceMock()
+        service.do_checkout(RequestFactory().get('/'), '')
 
 
 # ----------------------------------------------------------------------
@@ -103,8 +129,33 @@ class TestPostMpCreatePreferenceSignalHandlerIsCalled(tests_utils.BaseSignalTest
         [signals.post_mp_create_preference, 'post_mp_create_preference_handler']
     ]
 
-    def test(self):
+    def test_post_mp_create_preference_is_called(self):
         service = tests_utils.MercadoPagoServiceMock()
         service.do_checkout(RequestFactory().get('/'), '')
 
         self.assertEqual(self.post_mp_create_preference_handler.call_count, 1)
+
+
+class TestPostMpCreatePreferenceSignalParameters(tests_utils.BaseSignalTestCase):
+
+    SIGNALS = [
+        [signals.post_mp_create_preference, 'post_mp_create_preference_handler']
+    ]
+
+    def post_mp_create_preference_handler(self, signal, **kwargs):
+        payment = kwargs['payment']
+        user_checkout_identifier = kwargs['user_checkout_identifier']
+        request = kwargs['request']
+
+        self.assertIsNotNone(payment)
+        self.assertIsNotNone(user_checkout_identifier)
+        self.assertIsNotNone(request)
+
+        self.assertTrue(isinstance(payment, models.Payment))
+        self.assertTrue(payment.id > 0)
+        self.assertTrue(payment.checkout_preferences)
+        self.assertTrue(payment.checkout_response)
+
+    def test_post_mp_create_preference_parameters(self):
+        service = tests_utils.MercadoPagoServiceMock()
+        service.do_checkout(RequestFactory().get('/'), '')
