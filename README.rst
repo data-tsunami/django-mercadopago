@@ -87,12 +87,6 @@ Other tasks to do in this signal handler:
 * etc
 
 
-When the ``checkout_preferences_created`` signal is sent, 3 parameters are provided:
-
-* checkout_preferences
-* user_checkout_identifier
-* request
-
 The recommended way to use it is to connect to the signals in the ``models.py`` module::
 
     from django import dispatch
@@ -133,6 +127,10 @@ For example, to set the ``items`` to purchase, and the ``external_reference``::
 Parameters
 ==========
 
+* checkout_preferences
+* user_checkout_identifier
+* request
+
 Parameter: checkout_preference
 ******************************
 
@@ -172,7 +170,41 @@ is saved (if you added it to the ``checkout preferences``) to allow you to track
 If you need to save a reference to the ``Payment`` instance, you can register
 to the ``pre_mp_create_preference`` and/or ``post_mp_create_preference`` signals.
 
-The signal will be generated twice, since save() is called two times.
+
+Signal: pre_mp_create_preference
+--------------------------------
+
+Parameters
+==========
+
+* payment
+* user_checkout_identifier
+* request
+
+Parameter: payment
+******************
+
+Before calling ``mercadopago.MP().create_preference()``, an instance of ``models.Payment`` is created and saved
+to the database, and this instance is received in the signal handler of ``pre_mp_create_preference``.
+
+This is to allow the user associate the payment with one of the user's models.
+
+
+Signal: post_mp_create_preference
+---------------------------------
+
+Parameters
+==========
+
+* payment
+* create_preference_result
+* user_checkout_identifier
+* request
+
+Parameter: create_preference_result
+***********************************
+
+The dict returned by ``mercadopago.MP().create_preference()``.
 
 
 Known issues
